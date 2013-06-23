@@ -1,0 +1,10 @@
+{{#words.length}}
+<ul class="nav nav-pills nav-stacked">		
+	{{#words}}
+	<li><a><span class='badge badge-info'>{{{Dist}}}</span> &nbsp; {{Roman}}</a></li>
+	{{/words}}
+</ul>
+{{/words.length}}
+{{^words.length}}
+<em>No results found, try a shorter search term</em>
+{{/words.length}}

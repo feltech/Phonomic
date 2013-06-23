@@ -1,0 +1,22 @@
+{
+  "name" : "phonomic",
+  "version" : "0.0.1",
+  "private" : true,
+  "scripts" : {
+    "start" : "node app.js"
+  },
+  "dependencies" : {
+    "express" : "3.2.6",
+    "hjs" : "*"
+  },
+  "author" : {
+    "name" : "",
+    "email" : ""
+  },
+  "description" : "",
+  "keywords" : [ "" ],
+  "bugs" : {
+    "web" : "null"
+  },
+  "main" : "app.js"
+}

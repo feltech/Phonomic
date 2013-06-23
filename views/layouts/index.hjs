@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Phonomic</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- Le styles -->
+        <link href="css/style.css" media="screen" rel="stylesheet" type="text/css">
+		<link href="img/favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon">
+        <!-- Scripts -->
+        <!--[if lt IE 9]><script type="text/javascript" src="js/vendor/html5.js"></script><![endif]-->
+		<script type="text/javascript" data-main="js/main.js" src="js/vendor/require.js"></script>
+    </head>
+    <body>
+        <div class="navbar navbar-inverse navbar-fixed-top">
+            <div class="navbar-inner">
+                <div class="container">
+                    <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </a>
+                    <a class="brand" href="/">Phonemica</a>
+                    <div class="nav-collapse collapse">
+                        <ul class="nav">
+                            <!-- <li class="active"><a href="/phonetica/">Home</a></li> -->
+                        </ul>
+                    </div><!--/.nav-collapse -->
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div id="content">
+			</div>           
+			<hr>
+            <footer>
+				<div id="error-log"></div>
+                <p>&copy; 2013 by David & Ishrat Feltell. All rights reserved.</p>
+            </footer>
+        </div> <!-- /container -->
+	</body>
+</html>
