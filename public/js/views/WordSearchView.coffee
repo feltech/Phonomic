@@ -1,16 +1,17 @@
 define [
 	'jquery', 
 	'brite',
-	'templates',
+	'template/WordSearch',
+	'template/WordSearchList',
 	'utils/logger',
 	'models/WordSearchModel',
 	'lib/jquery/jquery.transit'
-], ($, brite, templates, log, WordSearchModel) ->
+], ($, brite, searchTmpl, listTmpl, log, WordSearchModel) ->
 
 	brite.registerView 'WordSearch',	
 		create: ()->
 			@model = brite.registerDao new WordSearchModel
-			return templates.WordSearch()
+			return searchTmpl.render()
 		events:
 			'submit; #form-search': (evt)->
 				# Prevent form from submitting normally.
@@ -31,7 +32,7 @@ define [
 			'result; WordSearchModel': (evt)->
 				$('#right-panel')
 					.hide()
-					.html(templates.WordSearchList(words: evt.daoEvent.result))
+					.html(listTmpl.render(words: evt.daoEvent.result))
 					.css(x: $(window).width())
 					.show()
 					.transition(x: 0, 300, 'snap') 

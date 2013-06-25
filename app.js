@@ -3,9 +3,21 @@
  Module dependencies.
 */
 
-var HoganCompiler, WordListModel, app, express, hoganCompiler, http, path, routes, user;
+var WordListModel, app, deferred, exec, express, fs, hjs, hogan, http, path, routes, sys, templateCache, user;
+
+process.kill(process.pid, 'SIGUSR1');
+
+sys = require('sys');
+
+exec = require('child_process').exec;
+
+exec('node-inspector');
 
 express = require('express');
+
+hjs = require('hjs');
+
+hogan = require('hogan.js');
 
 routes = require('./routes');
 
@@ -15,9 +27,13 @@ http = require('http');
 
 path = require('path');
 
-HoganCompiler = require('hogan-template-compiler');
+fs = require('fs');
+
+deferred = require('jquery-deferred').Deferred;
 
 WordListModel = require('./models/WordListModel');
+
+templateCache = {};
 
 app = express();
 
@@ -47,18 +63,36 @@ if (app.get('env') === 'development') {
   app.use(express.errorHandler());
 }
 
-hoganCompiler = HoganCompiler({
-  partialsDirectory: "" + (app.get('views')) + "/partials/",
-  layoutsDirectory: "" + (app.get('views')) + "/layouts/"
-});
-
 app.get('/', routes.index);
 
 app.get('/users', user.list);
 
-app.get("/js/templates.js", function(req, res) {
-  res.contentType(".js");
-  return res.send(hoganCompiler.getSharedTemplates());
+app.get("/js/template/:fileName", function(req, res, next) {
+  var fileName;
+  fileName = req.params.fileName.substr(0, req.params.fileName.lastIndexOf(".js"));
+  return deferred(function(defer) {
+    if (templateCache[fileName]) {
+      return defer.resolve(templateCache[fileName]);
+    } else {
+      return fs.readFile("" + (app.get('views')) + "/partials/" + fileName + ".hjs", {
+        encoding: 'utf8'
+      }, function(err, file) {
+        if (err) {
+          defer.reject(err);
+        } else {
+          templateCache[fileName] = "define(['hogan'], function (Hogan) {\n	return new Hogan.Template(" + (hogan.compile(file, {
+            asString: true
+          })) + ");\n});";
+        }
+        return defer.resolve(templateCache[fileName]);
+      });
+    }
+  }).done(function(tmpl) {
+    res.contentType('.js');
+    return res.send(tmpl);
+  }).fail(function(err) {
+    throw err;
+  });
 });
 
 app.post("/search", function(req, res) {

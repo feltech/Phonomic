@@ -1,9 +1,8 @@
 define [
 	'jquery', 
 	'brite',
-	'templates',
 	'views/WordSearchView'
-], ($, brite, templates) ->
+], ($, brite, WordSearchView) ->
 	brite.registerView 'MainView', emptyParent: true,
 		create: ()->
 			return "<div>"

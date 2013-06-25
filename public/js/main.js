@@ -3,7 +3,8 @@ requirejs.config({
   baseUrl: "js/",
   paths: {
     'brite': 'lib/brite',
-    'jquery': 'lib/jquery/jquery'
+    'jquery': 'lib/jquery/jquery',
+    'hogan': 'lib/hogan'
   },
   shim: {
     'brite': {
@@ -11,12 +12,8 @@ requirejs.config({
       deps: ['jquery']
     },
     'lib/jquery/jquery.transit': ['jquery'],
-    'lib/hogan': {
+    'hogan': {
       exports: 'Hogan'
-    },
-    'templates': {
-      exports: 'templates',
-      deps: ['lib/hogan', 'jquery']
     }
   }
 });
