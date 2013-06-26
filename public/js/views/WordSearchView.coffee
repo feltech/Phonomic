@@ -1,12 +1,15 @@
 define [
+	'underscore',
 	'jquery', 
 	'brite',
-	'template/WordSearch',
-	'template/WordSearchList',
+	'templates/WordSearch',
+	'templates/WordSearchList',
 	'utils/logger',
 	'models/WordSearchModel',
+	'views/WordEditView',
+	
 	'lib/jquery/jquery.transit'
-], ($, brite, searchTmpl, listTmpl, log, WordSearchModel) ->
+], (underscore, $, brite, searchTmpl, listTmpl, log, WordSearchModel, WordEditView) ->
 
 	brite.registerView 'WordSearch',	
 		create: ()->
@@ -23,19 +26,31 @@ define [
 				text = $('input', $target).val()
 				@$el.trigger 'search', text: text
 				return false
+			'click; #word-list > li': (evt)->
+				wordRef = $(evt.currentTarget).bEntity 'Word'
+				@$el.trigger 'edit', id: parseInt(wordRef.id, 10)
+				return false
+				
 		docEvents:
 			'search': (evt, data)->
 				@model.list(data.text)
 					.fail (xhr)->
 						$('#error-log').append xhr.responseText	
+						
+			'edit': (evt, data)->
+				$('#word-edit', @$el).bEmpty()
+				@model.cache(ID: data.id).done (word)->
+					brite.display 'WordEditView', $('#word-edit', @$el), word
+						
 		daoEvents:
 			'result; WordSearchModel': (evt)->
-				$('#right-panel')
-					.hide()
-					.html(listTmpl.render(words: evt.daoEvent.result))
-					.css(x: $(window).width())
-					.show()
-					.transition(x: 0, 300, 'snap') 
+				if evt.daoEvent.action == 'list'
+					$('#right-panel')
+						.hide()
+						.html(listTmpl.render(words: evt.daoEvent.result))
+						.css(x: $(window).width())
+						.show()
+						.transition(x: 0, 300, 'snap') 
 				console.debug(JSON.stringify(evt.daoEvent)) if log('debug')
 				return
 			

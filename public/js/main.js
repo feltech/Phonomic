@@ -4,7 +4,8 @@ requirejs.config({
   paths: {
     'brite': 'lib/brite',
     'jquery': 'lib/jquery/jquery',
-    'hogan': 'lib/hogan'
+    'hogan': 'lib/hogan',
+    'underscore': 'lib/underscore/underscore'
   },
   shim: {
     'brite': {
@@ -14,6 +15,9 @@ requirejs.config({
     'lib/jquery/jquery.transit': ['jquery'],
     'hogan': {
       exports: 'Hogan'
+    },
+    'underscore': {
+      exports: '_'
     }
   }
 });

@@ -3,7 +3,7 @@
  Module dependencies.
 */
 
-var WordListModel, app, deferred, exec, express, fs, hjs, hogan, http, path, routes, sys, templateCache, user;
+var WordListModel, app, deferred, exec, express, fs, hogan, http, path, routes, sys, template, user;
 
 process.kill(process.pid, 'SIGUSR1');
 
@@ -15,13 +15,13 @@ exec('node-inspector');
 
 express = require('express');
 
-hjs = require('hjs');
-
 hogan = require('hogan.js');
 
 routes = require('./routes');
 
 user = require('./routes/user');
+
+template = require('./routes/template');
 
 http = require('http');
 
@@ -32,8 +32,6 @@ fs = require('fs');
 deferred = require('jquery-deferred').Deferred;
 
 WordListModel = require('./models/WordListModel');
-
-templateCache = {};
 
 app = express();
 
@@ -67,33 +65,9 @@ app.get('/', routes.index);
 
 app.get('/users', user.list);
 
-app.get("/js/template/:fileName", function(req, res, next) {
-  var fileName;
-  fileName = req.params.fileName.substr(0, req.params.fileName.lastIndexOf(".js"));
-  return deferred(function(defer) {
-    if (templateCache[fileName]) {
-      return defer.resolve(templateCache[fileName]);
-    } else {
-      return fs.readFile("" + (app.get('views')) + "/partials/" + fileName + ".hjs", {
-        encoding: 'utf8'
-      }, function(err, file) {
-        if (err) {
-          defer.reject(err);
-        } else {
-          templateCache[fileName] = "define(['hogan'], function (Hogan) {\n	return new Hogan.Template(" + (hogan.compile(file, {
-            asString: true
-          })) + ");\n});";
-        }
-        return defer.resolve(templateCache[fileName]);
-      });
-    }
-  }).done(function(tmpl) {
-    res.contentType('.js');
-    return res.send(tmpl);
-  }).fail(function(err) {
-    throw err;
-  });
-});
+template.setDir(app.get('views'));
+
+app.get("/js/templates/:fileName", template);
 
 app.post("/search", function(req, res) {
   var model;

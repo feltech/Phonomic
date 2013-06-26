@@ -4,6 +4,7 @@ requirejs.config
 		'brite': 'lib/brite'
 		'jquery': 'lib/jquery/jquery'
 		'hogan': 'lib/hogan'
+		'underscore': 'lib/underscore/underscore'
 	shim:
 		'brite':
 			exports: 'brite'
@@ -11,9 +12,8 @@ requirejs.config
 		'lib/jquery/jquery.transit': ['jquery']
 		'hogan':
 			exports: 'Hogan'
-#		'templates':
-#			exports: 'templates'
-#			deps: ['lib/hogan', 'jquery']
+		'underscore':
+			exports: '_'
 
 requirejs ['app'], (app)->
 

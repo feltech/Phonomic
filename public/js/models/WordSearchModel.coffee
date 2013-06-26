@@ -1,8 +1,12 @@
 define [
+	'underscore',
 	'jquery', 
-	'brite'
-], ($, brite) ->
+	'brite',
+	'models/WordModel'
+], (_, $, brite, WordModel) ->
 	class WordSearchModel
+		_cache: []
+	
 		constructor: ()->
 		entityType: ()->
 			return 'WordSearchModel'
@@ -11,14 +15,21 @@ define [
 		remove: (id)->
 		removeMany: (ids)->
 		update: (data)->
-			return data
 		list: (text)->
-			$.post 'search', 
-				text: text, 
-				() -> # - empty function required to force jquery to use 4th (dataType) parameter and auto-parse response as json.
-					return
-				, 'json' 
-			
+			return $.Deferred (defer)=>
+				$.post 'search', 
+					text: text, 
+					() -> # - empty function required to force jquery to use 4th (dataType) parameter and auto-parse response as json.
+						return
+					, 'json' 
+				.done (data)=>
+					@_cache = []
+					@_cache.push(new WordModel(attrs)) for attrs in data
+					defer.resolve(@_cache)
+				.fail (xhr)=>
+					defer.reject(xhr)
+		cache: (attrs)->
+			if attrs then _(this._cache).findWhere attrs else this._cache
 
 #/**
 # * DAO Interface. Return value directly since it is in memory.

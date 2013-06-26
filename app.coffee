@@ -8,17 +8,18 @@ exec = require('child_process').exec;
 exec('node-inspector')
 
 express = require 'express'
-hjs = require 'hjs'
 hogan = require 'hogan.js'
+
 routes = require './routes'
 user = require './routes/user'
+template = require './routes/template'
+
 http = require 'http'
 path = require 'path'
 fs = require 'fs'
 deferred = require('jquery-deferred').Deferred
 
 WordListModel = require './models/WordListModel'
-templateCache = {}
 
 app = express()
 # all environments
@@ -40,25 +41,9 @@ if app.get('env') is 'development' then app.use express.errorHandler()
 
 app.get '/', routes.index
 app.get '/users', user.list
-app.get "/js/template/:fileName", (req, res, next)->
-	fileName = req.params.fileName.substr(0, req.params.fileName.lastIndexOf(".js"))
-	deferred (defer)->	
-		if templateCache[fileName]
-			defer.resolve templateCache[fileName]
-		else
-			fs.readFile "#{app.get('views')}/partials/#{fileName}.hjs", encoding: 'utf8', (err, file)->
-				if err then defer.reject err
-				else templateCache[fileName] = """
-					define(['hogan'], function (Hogan) {
-						return new Hogan.Template(#{hogan.compile(file, asString: true)});
-					});"""
-				defer.resolve templateCache[fileName]
-	.done (tmpl)->
-		res.contentType('.js')
-		res.send(tmpl)
-	.fail (err)->
-		throw err
 
+template.setDir app.get('views')
+app.get "/js/templates/:fileName", template
 
 app.post "/search", (req, res)->
 	model = new WordListModel()
