@@ -1,52 +1,64 @@
-<div style="position: absolute; z-index: 10">
+<div>
 	<form class="form-horizontal">
 {{#word}}
 		<fieldset>
-			<legend>{{Roman}}</legend>
+			<legend>{{Roman}} <button type="button" class="cancel close">&times;</button>&nbsp</legend>
 			<div class="control-group">
 				<label class="control-label" for="roman">Roman</label>
 				<div class="controls">
-					<input id="roman" type="text" name="roman" value="{{Roman}}" />
-					<button id="search-roman" class="btn"><i class="icon-search"></i></button>
+					<div class="input-append">
+						<input id="roman" type="text" name="roman" value="{{Roman}}" />
+						<button id="search-roman" type="button" class="btn"><i class="icon-search"></i></button>
+					</div>
 				</div>
 			</div>
 			<div class="control-group">
 				<label class="control-label" for="native">Native</label>
 				<div class="controls">
-					<input id="native" type="text" name="native" value="{{Native}}" />
-					<button id="search-native" class="btn"><i class="icon-search"></i></button>
+					<div class="input-append">
+						<input id="native" type="text" name="native" value="{{Native}}" />
+						<button id="search-native" type="button" class="btn"><i class="icon-search"></i></button>
+					</div>
 				</div>
 			</div>
 			<div class="control-group">
 				<label class="control-label" for="phonetic">Phonetic</label>
 				<div class="controls">
-					<input id="phonetic" type="text" name="phonetic" value="{{Phonetic}}" />
-					<button id="search-phonetic" class="btn"><i class="icon-search"></i></button>
+					<div class="input-append">
+						<input id="phonetic" type="text" name="phonetic" value="{{Phonetic}}" />
+						<button id="search-phonetic" type="button" class="btn"><i class="icon-search"></i></button>
+					</div>
 				</div>
 			</div>
 			<div class="control-group">
 				<label class="control-label" for="languages">Languages</label>
 				<div class="controls">
 {{/word}}
-					<select id="languages" name="languages">
+					<div class="input-append">
+						<select id="languages" name="languages">
+							<option value="">--select language--</option>
 {{#languages}}
-						<option value="{{Code}}">{{.}}</option>
+							<option value="{{ID}}">{{Name}}</option>
 {{/languages}}
-					</select>
-					<button id="add-language" class="btn"><i class="icon-plus"></i></button>
+						</select>
+						<button id="add-language" type="button" class="btn"><i class="icon-plus"></i></button>
+					</div>
 				</div>				
 			</div>
 			<div class="control-group">
-				<div class="controls">		
+				<div id="language-list" class="controls">		
 {{#word}}		
-	{{#Languages}}
-					<span class="label language label-info">{{.}} <button type="button" class="close" data-dismiss="label">&times;</button>&nbsp</span>
-	{{/Languages}}					
-{{/word}}		
+	{{> langList}}		
+{{/word}}
 				</div>				
 			</div>
-
-
+			<div class="control-group">
+				<div class="controls">
+					<button type="button" class="btn cancel">Cancel</button>
+					<button id="submit" type="button" class="btn btn-primary">Submit changes</button>
+				</div>
+			</div>
 		</fieldset>
 	</form>
+	<hr />
 </div>

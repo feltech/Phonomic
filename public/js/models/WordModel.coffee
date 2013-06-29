@@ -6,14 +6,7 @@ define [
 	class WordModel
 		constructor: (attrs)->
 			_.extend this, attrs
-			@Languages = @Languages.split "\t" if @Languages
 		entityType: ()->
 			return 'WordModel'
 		get: (id)->
-		create: ()->
-		remove: (id)->
-		removeMany: (ids)->
-		update: (data)->
-		list: (text)->
-
-			
+			if id then @attrs[id] else @attrs

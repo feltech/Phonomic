@@ -14,19 +14,28 @@ module.exports = class WordListModel
 			.field('Native')
 			.field('Phonetic')
 			.field('Languages')
-			.field("levenshtein(LOWER(Roman), LOWER('#{value}')) AS Dist")
-			.where("levenshtein(LOWER(Roman), LOWER('#{value}')) < CHAR_LENGTH('#{value}')")
-			.order('Dist')
-			.limit(100)
-			.toString()
+		
+		switch field
+			when 'Roman'
+				sql.field("levenshtein(LOWER(Roman), LOWER('#{value}')) AS Dist")
+					.where("levenshtein(LOWER(Roman), LOWER('#{value}')) < CHAR_LENGTH('#{value}')")
+			when 'Native'
+				sql.field("levenshtein(LOWER(Native), LOWER('#{value}')) AS Dist")
+					.where("levenshtein(LOWER(Native), LOWER('#{value}')) < CHAR_LENGTH('#{value}')")
+			when 'Phonetic'
+				sql.field("levenshtein(LOWER(Phonetic), LOWER('#{value}')) AS Dist")
+					.where("levenshtein(LOWER(Phonetic), LOWER('#{value}')) < CHAR_LENGTH('#{value}')")
+			else
+				sql.field("levenshtein(LOWER(Roman), LOWER('#{value}')) AS Dist")
+					.where("levenshtein(LOWER(Roman), LOWER('#{value}')) < CHAR_LENGTH('#{value}')")
+						
+		sql = sql.order('Dist').limit(100).toString()
 		
 			
 #		sql = "SELECT *, levenshtein(LOWER(Roman), LOWER('#{text}')) AS Dist FROM 
 #				(SELECT * FROM Words WHERE SOUNDEX(Roman) LIKE CONCAT(SOUNDEX('#{text}'),'%')) AS ReducedList 
 #				WHERE levenshtein(LOWER(Roman), LOWER('#{text}')) < CHAR_LENGTH('#{text}')/2+1
 #				ORDER BY Dist";
-#		sql = "SELECT *, levenshtein(LOWER(Roman), LOWER('#{text}')) AS Dist FROM Words
-#				WHERE levenshtein(LOWER(Roman), LOWER('#{text}')) < CHAR_LENGTH('#{text}')
-#				ORDER BY Dist LIMIT 100"#;
+
 		return Database.Instance().query(sql)
 			

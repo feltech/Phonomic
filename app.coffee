@@ -13,6 +13,7 @@ hogan = require 'hogan.js'
 routes = require './routes'
 user = require './routes/user'
 template = require './routes/template'
+list = require './routes/list'
 
 http = require 'http'
 path = require 'path'
@@ -44,6 +45,8 @@ app.get '/users', user.list
 
 template.setDir app.get('views')
 app.get "/js/templates/:fileName", template
+
+app.get '/list/:id', list
 
 app.post "/search", (req, res)->
 	model = new WordListModel()

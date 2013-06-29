@@ -7,6 +7,6 @@
 	</ul>
 {{/words.length}}
 {{^words.length}}
-	<em>enter search term to begin</em>
+	<em>no results - enter new search term</em>
 {{/words.length}}
 </div>

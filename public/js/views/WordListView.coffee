@@ -2,20 +2,20 @@ define [
 	'underscore',
 	'jquery',
 	'brite',
-	'models/WordListModel',
 	'templates/WordSearchList',
 	'utils/logger',
 
 	'lib/jquery/jquery.transit'
-], (_, $, brite, WordListModel, listTmpl, log) ->
+], (_, $, brite, listTmpl, log) ->
 	
 	transitTime = 200
 
 	brite.registerView 'WordListView',
-		create: (words)->
-			@model = brite.registerDao new WordListModel(words)
-			return @model.cache().then (cache)-> 
-				return $.Deferred().resolve(listTmpl.render words: cache)
+		create: ->
+			@dao = brite.dao "Word"
+			@transition = $.Deferred().resolve()
+			return @dao.cache().then (cache)-> 
+				return listTmpl.render words: cache
 
 		init: ->
 			console.debug("WordListView.init: #{@$el.length}") if log('trace')
@@ -28,7 +28,6 @@ define [
 			return
 		hide: ->
 			console.debug("WordListView.hide") if log('trace')
-#			@$el.css(opacity: 1)
 			return $.Deferred (defer)=>
 				@$el.transition opacity: 0, transitTime, 'ease', =>
 					defer.resolve(@$el)
@@ -37,29 +36,27 @@ define [
 		events:
 			'click; li': (evt)->
 				wordRef = $(evt.currentTarget).bEntity 'Word'
-				@model.cache(ID: parseInt(wordRef.id)).done (word)=>
+				@dao.cache(ID: parseInt(wordRef.id)).done (word)=>
 					@$el.trigger 'edit', word: word
 				return false	
 		
 		docEvents: 
 			'search': (evt, data)->
-#				hide = @hide()
-				fetch = @model.list(data.field, data.text)
-				$.when(fetch)
-					.then ->
-						console.debug("WordListView.event.search: fetch and transition complete") if log('trace')
-						return
-					.fail (xhr)->
-						$('#error-log').append xhr.responseText	
+				if @transition.state() == 'resolved'
+					@transition = @hide()
+					@dao.list(data.field, data.text)
 				return
 
 		daoEvents:
-			'result; WordListModel': (evt)->
+			'result; Word': (evt)->
 				if evt.daoEvent.action == 'list'
-					@hide().done =>
-						@$el.html(listTmpl.render(words: evt.daoEvent.result))
-							.css(x: $(window).width())
-							.show()
-							.transition(x: 0, opacity: 1, transitTime, 'snap') 
+					@transition.then =>
+						return $.Deferred (@transition)=>
+							@$el.html(listTmpl.render(words: evt.daoEvent.result))
+								.css(x: $(window).width())
+								.transition x: 0, opacity: 1, transitTime, 'snap', =>
+									@transition.resolve()
+								
 				console.debug(JSON.stringify(evt.daoEvent)) if log('trace')
 				return
+			

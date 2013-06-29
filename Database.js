@@ -16,19 +16,19 @@ module.exports = Database = (function() {
   }
 
   Database.prototype.query = function(sql, attrs) {
-    var defer, query,
-      _this = this;
-    defer = deferred();
-    query = this.connection.query(sql, attrs, function(err, result) {
-      console.log(result ? "" + result.length + " records found" : err);
-      if (err) {
-        return defer.reject(err);
-      } else {
-        return defer.resolve(result);
-      }
+    var _this = this;
+    return deferred(function(defer) {
+      var query;
+      query = _this.connection.query(sql, attrs, function(err, result) {
+        console.log(result ? "" + result.length + " records found" : err);
+        if (err) {
+          return defer.reject(err);
+        } else {
+          return defer.resolve(result);
+        }
+      });
+      return console.log(query.sql);
     });
-    console.log(query.sql);
-    return defer;
   };
 
   return Database;

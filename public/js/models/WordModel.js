@@ -4,26 +4,19 @@ define(['underscore', 'jquery', 'brite'], function(_, $, brite) {
   return WordModel = (function() {
     function WordModel(attrs) {
       _.extend(this, attrs);
-      if (this.Languages) {
-        this.Languages = this.Languages.split("\t");
-      }
     }
 
     WordModel.prototype.entityType = function() {
       return 'WordModel';
     };
 
-    WordModel.prototype.get = function(id) {};
-
-    WordModel.prototype.create = function() {};
-
-    WordModel.prototype.remove = function(id) {};
-
-    WordModel.prototype.removeMany = function(ids) {};
-
-    WordModel.prototype.update = function(data) {};
-
-    WordModel.prototype.list = function(text) {};
+    WordModel.prototype.get = function(id) {
+      if (id) {
+        return this.attrs[id];
+      } else {
+        return this.attrs;
+      }
+    };
 
     return WordModel;
 

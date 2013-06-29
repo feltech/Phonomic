@@ -3,7 +3,7 @@
  Module dependencies.
 */
 
-var WordListModel, app, deferred, exec, express, fs, hogan, http, path, routes, sys, template, user;
+var WordListModel, app, deferred, exec, express, fs, hogan, http, list, path, routes, sys, template, user;
 
 process.kill(process.pid, 'SIGUSR1');
 
@@ -22,6 +22,8 @@ routes = require('./routes');
 user = require('./routes/user');
 
 template = require('./routes/template');
+
+list = require('./routes/list');
 
 http = require('http');
 
@@ -68,6 +70,8 @@ app.get('/users', user.list);
 template.setDir(app.get('views'));
 
 app.get("/js/templates/:fileName", template);
+
+app.get('/list/:id', list);
 
 app.post("/search", function(req, res) {
   var model;

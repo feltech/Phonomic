@@ -32,12 +32,17 @@ define [
 
 		docEvents:
 			'edit': (evt, data)->
-				@editView?.hide().done ($el)-> 
-					$el.bEmpty().remove()
-
-				brite.display('WordEditView', $('#word-edit'), data.word)
-					.done (@editView)=> 
-						$('#word-edit', @$el).height @editView.$el.height()
+				return $.Deferred().resolve().then =>
+						if @editView 
+							# Hide then empty inner then remove.  Do not simply call @editView.remove()
+							# since that will reset the parent els height, causing FOUS when new edit
+							# view is rendered.
+							return @editView.hide().then ($el)-> 
+								$el?.bEmpty().remove()
+					.then =>
+						brite.display('WordEditView', $('#word-edit'), data.word)
+							.done (@editView)=> 
+								$('#word-edit', @$el).height @editView.$el.height()
 		daoEvents: {}
 			
 			

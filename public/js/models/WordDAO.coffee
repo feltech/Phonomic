@@ -4,12 +4,12 @@ define [
 	'brite',
 	'models/WordModel'
 ], (_, $, brite, WordModel) ->
-	class WordListModel
+	class WordDAO
 		_cache: []
 	
 		constructor: ()->
 		entityType: ()->
-			return 'WordListModel'
+			return 'Word'
 		get: (id)->
 		create: ()->
 		remove: (id)->
@@ -21,10 +21,12 @@ define [
 					() -> # - empty function required to force jquery to use 4th (dataType) parameter and auto-parse response as json.
 						return
 					, 'json' 
-				.done (data)=>
+				.then (data)=>
 					@_cache = []
 					@_cache.push(new WordModel(attrs)) for attrs in data
 					return @_cache
+				.fail (xhr)->
+					$('#error-log').append xhr.responseText	
 
 		cache: (attrs)->
 			if attrs then _(this._cache).findWhere attrs else this._cache

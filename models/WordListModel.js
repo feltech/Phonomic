@@ -18,7 +18,21 @@ module.exports = WordListModel = (function() {
 
   WordListModel.prototype.list = function(field, value) {
     var sql;
-    sql = squel.select().from('Words').field('ID').field('Roman').field('Native').field('Phonetic').field('Languages').field("levenshtein(LOWER(Roman), LOWER('" + value + "')) AS Dist").where("levenshtein(LOWER(Roman), LOWER('" + value + "')) < CHAR_LENGTH('" + value + "')").order('Dist').limit(100).toString();
+    sql = squel.select().from('Words').field('ID').field('Roman').field('Native').field('Phonetic').field('Languages');
+    switch (field) {
+      case 'Roman':
+        sql.field("levenshtein(LOWER(Roman), LOWER('" + value + "')) AS Dist").where("levenshtein(LOWER(Roman), LOWER('" + value + "')) < CHAR_LENGTH('" + value + "')");
+        break;
+      case 'Native':
+        sql.field("levenshtein(LOWER(Native), LOWER('" + value + "')) AS Dist").where("levenshtein(LOWER(Native), LOWER('" + value + "')) < CHAR_LENGTH('" + value + "')");
+        break;
+      case 'Phonetic':
+        sql.field("levenshtein(LOWER(Phonetic), LOWER('" + value + "')) AS Dist").where("levenshtein(LOWER(Phonetic), LOWER('" + value + "')) < CHAR_LENGTH('" + value + "')");
+        break;
+      default:
+        sql.field("levenshtein(LOWER(Roman), LOWER('" + value + "')) AS Dist").where("levenshtein(LOWER(Roman), LOWER('" + value + "')) < CHAR_LENGTH('" + value + "')");
+    }
+    sql = sql.order('Dist').limit(100).toString();
     return Database.Instance().query(sql);
   };
 

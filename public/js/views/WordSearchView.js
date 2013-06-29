@@ -27,16 +27,18 @@ define(['underscore', 'jquery', 'brite', 'templates/WordSearch', 'utils/logger',
     },
     docEvents: {
       'edit': function(evt, data) {
-        var _ref,
-          _this = this;
-        if ((_ref = this.editView) != null) {
-          _ref.hide().done(function($el) {
-            return $el.bEmpty().remove();
+        var _this = this;
+        return $.Deferred().resolve().then(function() {
+          if (_this.editView) {
+            return _this.editView.hide().then(function($el) {
+              return $el != null ? $el.bEmpty().remove() : void 0;
+            });
+          }
+        }).then(function() {
+          return brite.display('WordEditView', $('#word-edit'), data.word).done(function(editView) {
+            _this.editView = editView;
+            return $('#word-edit', _this.$el).height(_this.editView.$el.height());
           });
-        }
-        return brite.display('WordEditView', $('#word-edit'), data.word).done(function(editView) {
-          _this.editView = editView;
-          return $('#word-edit', _this.$el).height(_this.editView.$el.height());
         });
       }
     },

@@ -6671,7 +6671,12 @@ span.label.language {
   line-height: 18.5px;
 }
 
+div#word-edit {
+  width: 100%;
+}
 div#word-edit > div {
-  position: absolute;
+  position: relative;
+  float: right;
+  max-width: 100%;
   z-index: 1;
 }
