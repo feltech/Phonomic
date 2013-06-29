@@ -1,11 +1,14 @@
 define [
 	'jquery', 
 	'brite',
+	
 	'views/WordSearchView'
-], ($, brite, WordSearchView) ->
+	'views/WordListView'
+], ($, brite) ->
 	brite.registerView 'MainView', emptyParent: true,
 		create: ()->
 			return "<div>"
 		postDisplay: ()->
-			brite.display 'WordSearch', @$el
+			brite.display 'WordSearchView', @$el
+			brite.display 'WordListView', $('#right-panel')
 			return true

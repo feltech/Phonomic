@@ -29,7 +29,6 @@
                 </div>
             </div>
         </div>
-        <div class="container">
             <div id="content">
 			</div>           
 			<hr>
@@ -37,6 +36,5 @@
 				<div id="error-log"></div>
                 <p>&copy; 2013 by David & Ishrat Feltell. All rights reserved.</p>
             </footer>
-        </div> <!-- /container -->
-	</body>
+ 	</body>
 </html>

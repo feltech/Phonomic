@@ -3,17 +3,17 @@ define [
 	'jquery', 
 	'brite',
 	'templates/WordSearch',
-	'templates/WordSearchList',
 	'utils/logger',
-	'models/WordSearchModel',
-	'views/WordEditView',
 	
+	'views/WordEditView',
+	'views/WordListView',	
 	'lib/jquery/jquery.transit'
-], (underscore, $, brite, searchTmpl, listTmpl, log, WordSearchModel, WordEditView) ->
+], (underscore, $, brite, searchTmpl, log) ->
 
-	brite.registerView 'WordSearch',	
+	transitTime = 500
+
+	brite.registerView 'WordSearchView',	
 		create: ()->
-			@model = brite.registerDao new WordSearchModel
 			return searchTmpl.render()
 		events:
 			'submit; #form-search': (evt)->
@@ -24,34 +24,20 @@ define [
 				$('#error-log').bEmpty() 
 				# Get the query text
 				text = $('input', $target).val()
-				@$el.trigger 'search', text: text
+				@$el.trigger 'search', field: 'Roman', text: text
 				return false
-			'click; #word-list > li': (evt)->
-				wordRef = $(evt.currentTarget).bEntity 'Word'
-				@$el.trigger 'edit', id: parseInt(wordRef.id, 10)
-				return false
-				
+		postDisplay: ->
+			console.debug("WordSearchView.postDisplay") if log('trace')
+			return
+
 		docEvents:
-			'search': (evt, data)->
-				@model.list(data.text)
-					.fail (xhr)->
-						$('#error-log').append xhr.responseText	
-						
 			'edit': (evt, data)->
-				$('#word-edit', @$el).bEmpty()
-				@model.cache(ID: data.id).done (word)->
-					brite.display 'WordEditView', $('#word-edit', @$el), word
-						
-		daoEvents:
-			'result; WordSearchModel': (evt)->
-				if evt.daoEvent.action == 'list'
-					$('#right-panel')
-						.hide()
-						.html(listTmpl.render(words: evt.daoEvent.result))
-						.css(x: $(window).width())
-						.show()
-						.transition(x: 0, 300, 'snap') 
-				console.debug(JSON.stringify(evt.daoEvent)) if log('debug')
-				return
+				@editView?.hide().done ($el)-> 
+					$el.bEmpty().remove()
+
+				brite.display('WordEditView', $('#word-edit'), data.word)
+					.done (@editView)=> 
+						$('#word-edit', @$el).height @editView.$el.height()
+		daoEvents: {}
 			
 			

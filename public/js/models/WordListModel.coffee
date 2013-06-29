@@ -4,30 +4,28 @@ define [
 	'brite',
 	'models/WordModel'
 ], (_, $, brite, WordModel) ->
-	class WordSearchModel
+	class WordListModel
 		_cache: []
 	
 		constructor: ()->
 		entityType: ()->
-			return 'WordSearchModel'
+			return 'WordListModel'
 		get: (id)->
 		create: ()->
 		remove: (id)->
 		removeMany: (ids)->
 		update: (data)->
-		list: (text)->
-			return $.Deferred (defer)=>
-				$.post 'search', 
-					text: text, 
+		list: (field, value)->
+			return $.post 'search', 
+					field: field, value: value, 
 					() -> # - empty function required to force jquery to use 4th (dataType) parameter and auto-parse response as json.
 						return
 					, 'json' 
 				.done (data)=>
 					@_cache = []
 					@_cache.push(new WordModel(attrs)) for attrs in data
-					defer.resolve(@_cache)
-				.fail (xhr)=>
-					defer.reject(xhr)
+					return @_cache
+
 		cache: (attrs)->
 			if attrs then _(this._cache).findWhere attrs else this._cache
 

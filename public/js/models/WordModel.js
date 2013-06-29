@@ -4,6 +4,9 @@ define(['underscore', 'jquery', 'brite'], function(_, $, brite) {
   return WordModel = (function() {
     function WordModel(attrs) {
       _.extend(this, attrs);
+      if (this.Languages) {
+        this.Languages = this.Languages.split("\t");
+      }
     }
 
     WordModel.prototype.entityType = function() {

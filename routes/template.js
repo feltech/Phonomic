@@ -18,7 +18,7 @@ template = function(req, res) {
     _this = this;
   fileName = req.params.fileName.substr(0, req.params.fileName.lastIndexOf(".js"));
   return deferred(function(defer) {
-    if (templateCache[fileName]) {
+    if (templateCache[fileName] && false) {
       return defer.resolve(templateCache[fileName]);
     } else {
       return fs.readFile("" + dir + "/partials/" + fileName + "." + extn, {

@@ -47,7 +47,7 @@ app.get "/js/templates/:fileName", template
 
 app.post "/search", (req, res)->
 	model = new WordListModel()
-	model.list(req.body.text).done (json)->
+	model.list(req.body.field, req.body.value).done (json)->
 		res.send json
 
 

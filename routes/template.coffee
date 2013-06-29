@@ -9,7 +9,7 @@ dir = "."
 template = (req, res)->
 	fileName = req.params.fileName.substr(0, req.params.fileName.lastIndexOf(".js"))
 	deferred (defer)=>	
-		if templateCache[fileName]
+		if templateCache[fileName] && false
 			defer.resolve templateCache[fileName]
 		else
 			fs.readFile "#{dir}/partials/#{fileName}.#{extn}", encoding: 'utf8', (err, file)->

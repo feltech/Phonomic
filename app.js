@@ -72,7 +72,7 @@ app.get("/js/templates/:fileName", template);
 app.post("/search", function(req, res) {
   var model;
   model = new WordListModel();
-  return model.list(req.body.text).done(function(json) {
+  return model.list(req.body.field, req.body.value).done(function(json) {
     return res.send(json);
   });
 });

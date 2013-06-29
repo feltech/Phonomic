@@ -7,8 +7,26 @@ body {
 
 @import "bootstrap-responsive";
 
-div.container > a.brand {
+a.brand {
 /*    background: url("../img/zf2-logo.png") no-repeat scroll 0 10px transparent;*/
     margin-left: 0;
     padding: 8px 20px 12px 40px;
+}
+
+div#content {
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+span.label.language {
+	line-height: 18.5px;
+}
+
+select#languages {
+
+}
+
+div#word-edit > div {
+	position: absolute;
+	z-index: 1;
 }

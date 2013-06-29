@@ -1,4 +1,4 @@
-<div>
+<div style="position: absolute; z-index: 10">
 	<form class="form-horizontal">
 {{#word}}
 		<fieldset>
@@ -7,36 +7,46 @@
 				<label class="control-label" for="roman">Roman</label>
 				<div class="controls">
 					<input id="roman" type="text" name="roman" value="{{Roman}}" />
+					<button id="search-roman" class="btn"><i class="icon-search"></i></button>
 				</div>
 			</div>
 			<div class="control-group">
 				<label class="control-label" for="native">Native</label>
 				<div class="controls">
 					<input id="native" type="text" name="native" value="{{Native}}" />
+					<button id="search-native" class="btn"><i class="icon-search"></i></button>
 				</div>
 			</div>
 			<div class="control-group">
 				<label class="control-label" for="phonetic">Phonetic</label>
 				<div class="controls">
 					<input id="phonetic" type="text" name="phonetic" value="{{Phonetic}}" />
+					<button id="search-phonetic" class="btn"><i class="icon-search"></i></button>
 				</div>
 			</div>
 			<div class="control-group">
 				<label class="control-label" for="languages">Languages</label>
 				<div class="controls">
-	{{#Languages}}
-					<span class="label">{{.}}</span>
-	{{/Languages}}
 {{/word}}
-					
-					<select id="languages" type="text" name="languages">
+					<select id="languages" name="languages">
 {{#languages}}
-						<option value="{{Code}}">{{Name}}</option>
+						<option value="{{Code}}">{{.}}</option>
 {{/languages}}
 					</select>
-				</div>
-			</div>			
-		<fieldset>	
+					<button id="add-language" class="btn"><i class="icon-plus"></i></button>
+				</div>				
+			</div>
+			<div class="control-group">
+				<div class="controls">		
+{{#word}}		
+	{{#Languages}}
+					<span class="label language label-info">{{.}} <button type="button" class="close" data-dismiss="label">&times;</button>&nbsp</span>
+	{{/Languages}}					
+{{/word}}		
+				</div>				
+			</div>
 
+
+		</fieldset>
 	</form>
 </div>
