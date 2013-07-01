@@ -4,11 +4,12 @@ define [
 	'brite',
 	'templates/WordSearch',
 	'utils/logger',
+	'models/WordModel',
 	
 	'views/WordEditView',
 	'views/WordListView',	
 	'lib/jquery/jquery.transit'
-], (underscore, $, brite, searchTmpl, log) ->
+], (underscore, $, brite, searchTmpl, log, WordModel) ->
 
 	transitTime = 500
 
@@ -24,25 +25,38 @@ define [
 				$('#error-log').bEmpty() 
 				# Get the query text
 				text = $('input', $target).val()
-				@$el.trigger 'search', field: 'Roman', text: text
+				@$el.trigger 'search', field: 'Native', text: text
 				return false
-		postDisplay: ->
+			'click; button#new-word': (evt)->
+				$target = $(evt.currentTarget)
+				text = $('#form-search > input').val()
+				@$el.trigger 'create', Native: text
+				
+		postDisplay: ->	
 			console.debug("WordSearchView.postDisplay") if log('trace')
 			return
 
 		docEvents:
 			'edit': (evt, data)->
-				return $.Deferred().resolve().then =>
-						if @editView 
-							# Hide then empty inner then remove.  Do not simply call @editView.remove()
-							# since that will reset the parent els height, causing FOUS when new edit
-							# view is rendered.
-							return @editView.hide().then ($el)-> 
-								$el?.bEmpty().remove()
+				return @hideEditView()
 					.then =>
 						brite.display('WordEditView', $('#word-edit'), data.word)
 							.done (@editView)=> 
-								$('#word-edit', @$el).height @editView.$el.height()
+								
+			'create': (evt, data)->
+				return @hideEditView()
+					.then =>
+						brite.display('WordEditView', $('#word-edit'), new WordModel(data))
+							.done (@editView)=> 
+						
 		daoEvents: {}
 			
+		hideEditView: ()->
+			return $.Deferred().resolve().then =>
+					if @editView 
+						# Hide then empty inner then remove.  Do not simply call @editView.remove()
+						# since that will reset the parent els height, causing FOUS when new edit
+						# view is rendered.
+						return @editView.hide().then ($el)-> 
+							$el?.bEmpty().remove()
 			

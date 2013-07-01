@@ -12,17 +12,64 @@ define(['underscore', 'jquery', 'brite', 'models/WordModel'], function(_, $, bri
 
     WordDAO.prototype.get = function(id) {};
 
-    WordDAO.prototype.create = function() {};
+    WordDAO.prototype.create = function(data) {
+      var _this = this;
+      if (data instanceof WordModel) {
+        return $.post("word/create", data, null, "json").then(function(data) {
+          var word;
+          if (data) {
+            word = _(_this._cache).findWhere({
+              ID: data != null ? data.ID : void 0
+            });
+            if (word) {
+              _(word).extend(data);
+            } else {
+              word = new WordModel(data);
+              _this._cache.push(word);
+            }
+          }
+          return word || $.Deferred.reject();
+        }).fail(function(xhr) {
+          return $('#error-log').append(xhr.responseText);
+        });
+      } else {
+        return $.Deferred().reject();
+      }
+    };
 
     WordDAO.prototype.remove = function(id) {};
 
     WordDAO.prototype.removeMany = function(ids) {};
 
-    WordDAO.prototype.update = function(data) {};
+    WordDAO.prototype.update = function(data) {
+      var _this = this;
+      if (data instanceof WordModel) {
+        return $.post("word/update", data, null, "json").then(function(data) {
+          var word;
+          if (data) {
+            word = _(_this._cache).findWhere({
+              ID: data != null ? data.ID : void 0
+            });
+            if (word) {
+              _(word).extend(data);
+            } else {
+              word = new WordModel(data);
+              _this._cache.push(word);
+            }
+          }
+          return word || $.Deferred.reject();
+        }).fail(function(xhr) {
+          return $('#error-log').append(xhr.responseText);
+        });
+      } else {
+        return $.Deferred().reject();
+      }
+    };
 
     WordDAO.prototype.list = function(field, value) {
       var _this = this;
-      return $.post('search', {
+      value = escape(value);
+      return $.post('word/search', {
         field: field,
         value: value
       }, function() {}, 'json').then(function(data) {

@@ -3,6 +3,9 @@ mysql = require('mysql');
 # Promise implementation.
 deferred = require('jquery-deferred').Deferred
 
+isRetry = false
+instance = null
+
 # Database wrapper utility class.
 module.exports = class Database
 	constructor: ()->
@@ -16,12 +19,22 @@ module.exports = class Database
 	# the promise idiom for returning responses.
 	query: (sql, attrs)->
 		return deferred (defer)=>
-			query = @connection.query sql, attrs, (err, result)=>
-				console.log if result then "#{result.length} records found" else err
-				if err then defer.reject(err) else defer.resolve(result)
-			console.log(query.sql);
+			try
+				query = @connection.query sql, attrs, (err, result)=>
+					console.log if result then "#{result.length} records found" else err
+					if err then defer.reject(err) else defer.resolve(result)
+				isRetry = false
+				console.log "Database. #{query.sql}"
+			catch e
+				if not isRetry
+					console.warn "WARN: Database query failed, retrying. #{query.sql} :: #{e.message} :: #{e.stack}"
+					isRetry = true
+					instance = null
+					Database.Instance().query(sql, attrs)
+				else
+					console.error "ERROR: Database query failed, retry failed. #{query.sql} :: #{e.message} :: #{e.stack}"
 			
-# Create singleton database handler.
-instance = null
-Database.Instance = ()->
-	if instance then instance else instance = new Database()
+	@Instance: ()->
+		if instance then instance else instance = new Database()			
+			
+			

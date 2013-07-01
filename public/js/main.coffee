@@ -5,6 +5,7 @@ requirejs.config
 		'jquery': 'lib/jquery/jquery'
 		'hogan': 'lib/hogan'
 		'underscore': 'lib/underscore/underscore'
+		'underscore.string': 'lib/underscore/underscore.string'
 	shim:
 		'brite':
 			exports: 'brite'

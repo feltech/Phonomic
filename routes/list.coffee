@@ -2,10 +2,6 @@ deferred = require('jquery-deferred').Deferred
 Database = require '../Database' 
 squel = require 'squel'
 
-extn = "hjs"
-templateCache = {}
-dir = "."
-
 list = (req, res)->
 	switch req.params.id
 		when 'languages'

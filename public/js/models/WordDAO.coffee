@@ -11,12 +11,44 @@ define [
 		entityType: ()->
 			return 'Word'
 		get: (id)->
-		create: ()->
+		create: (data)->
+			if data instanceof WordModel
+				return $.post("word/create", data, null, "json")
+				.then (data)=>
+					if data
+						word = _(@_cache).findWhere(ID: data?.ID)
+						if word 
+							_(word).extend data
+						else
+							word = new WordModel(data)
+							@_cache.push word
+
+					return word || $.Deferred.reject();
+				.fail (xhr)->
+					$('#error-log').append xhr.responseText
+			else return $.Deferred().reject()			
 		remove: (id)->
 		removeMany: (ids)->
-		update: (data)->
+		update: (data)->	
+			if data instanceof WordModel
+				return $.post("word/update", data, null, "json")
+				.then (data)=>
+					if data
+						word = _(@_cache).findWhere(ID: data?.ID)
+						if word 
+							_(word).extend data
+						else
+							word = new WordModel(data)
+							@_cache.push word
+
+					return word || $.Deferred.reject();
+				.fail (xhr)->
+					$('#error-log').append xhr.responseText
+			else return $.Deferred().reject()
+				
 		list: (field, value)->
-			return $.post 'search', 
+			value = escape(value)
+			return $.post 'word/search', 
 					field: field, value: value, 
 					() -> # - empty function required to force jquery to use 4th (dataType) parameter and auto-parse response as json.
 						return

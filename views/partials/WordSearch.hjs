@@ -7,6 +7,7 @@
 						<form class="form-search pull-right" action="#" id="form-search">
 							<input type="text" class="input-medium search-query" />
 							<button type="submit" class="btn btn-primary"><i class="icon-search icon-white"></i></button>
+							<button id="new-word" type="button" class="btn"><i class="icon-plus"></i></button>
 						</form>
 					</div>
 				</div>

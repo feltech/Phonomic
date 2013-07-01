@@ -6,10 +6,6 @@ define(['underscore', 'jquery', 'brite'], function(_, $, brite) {
       _.extend(this, attrs);
     }
 
-    WordModel.prototype.entityType = function() {
-      return 'WordModel';
-    };
-
     WordModel.prototype.get = function(id) {
       if (id) {
         return this.attrs[id];

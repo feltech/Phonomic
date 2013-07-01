@@ -5,7 +5,8 @@ requirejs.config({
     'brite': 'lib/brite',
     'jquery': 'lib/jquery/jquery',
     'hogan': 'lib/hogan',
-    'underscore': 'lib/underscore/underscore'
+    'underscore': 'lib/underscore/underscore',
+    'underscore.string': 'lib/underscore/underscore.string'
   },
   shim: {
     'brite': {

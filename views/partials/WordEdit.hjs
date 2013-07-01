@@ -1,8 +1,9 @@
 <div>
-	<form class="form-horizontal">
+	<form id="form-edit" class="form-horizontal">
 {{#word}}
 		<fieldset>
-			<legend>{{Roman}} <button type="button" class="cancel close">&times;</button>&nbsp</legend>
+			<legend>{{Native}} <button type="button" class="cancel close">&times;</button>&nbsp</legend>
+			<small><span id="word-id" class="muted">{{#ID}}#{{.}}{{/ID}}{{^ID}}new{{/ID}}</span></small>
 			<div class="control-group">
 				<label class="control-label" for="roman">Roman</label>
 				<div class="controls">
@@ -16,7 +17,7 @@
 				<label class="control-label" for="native">Native</label>
 				<div class="controls">
 					<div class="input-append">
-						<input id="native" type="text" name="native" value="{{Native}}" />
+						<input id="native" type="text" name="native" value="{{Native}}" required />
 						<button id="search-native" type="button" class="btn"><i class="icon-search"></i></button>
 					</div>
 				</div>
@@ -43,22 +44,26 @@
 						</select>
 						<button id="add-language" type="button" class="btn"><i class="icon-plus"></i></button>
 					</div>
-				</div>				
+				</div>
 			</div>
 			<div class="control-group">
-				<div id="language-list" class="controls">		
-{{#word}}		
-	{{> langList}}		
+				<div id="language-list" class="controls">
+{{#word}}
+	{{> langList}}
 {{/word}}
-				</div>				
+				</div>
 			</div>
 			<div class="control-group">
 				<div class="controls">
 					<button type="button" class="btn cancel">Cancel</button>
-					<button id="submit" type="button" class="btn btn-primary">Submit changes</button>
+					<button id="submit" type="submit" class="btn btn-primary">Submit changes</button>
 				</div>
 			</div>
 		</fieldset>
 	</form>
+	<div id="submit-state" class="alert invisible">
+		<a href="#" class="close" data-dismiss="alert">&times;</a>
+		<strong></strong> <span></span>
+	</div>
 	<hr />
 </div>

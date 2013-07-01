@@ -1,3 +1,3 @@
 	{{#Languages}}
-					<span data-entity-id="{{ID}}" data-entity="Language" class="label language label-info">{{Name}} <button type="button" class="delete-language close">&times;</button>&nbsp</span>
+					<span data-entity-id="{{ID}}" data-entity="Language" class="label language label-info"><span>{{Name}}</span> &nbsp <button type="button" class="delete-language close">&times;</button></span>
 	{{/Languages}}					

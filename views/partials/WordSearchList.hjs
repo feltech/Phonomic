@@ -2,7 +2,7 @@
 {{#words.length}}
 	<ul id="word-list" class="nav nav-pills nav-stacked">		
 	{{#words}}
-		<li data-entity="Word" data-entity-id="{{ID}}"><a><span class='badge badge-info'>{{{Dist}}}</span> &nbsp; {{Roman}}</a></li>
+		<li data-entity="Word" data-entity-id="{{ID}}"><a><span class='badge badge-info'>{{{Dist}}}</span> &nbsp; {{Native}}</a></li>
 	{{/words}}
 	</ul>
 {{/words.length}}

@@ -3,6 +3,7 @@
 body {
     padding-top: 60px;
     padding-bottom: 40px;
+	overflow-x: hidden;
 }
 
 @import "bootstrap-responsive";
@@ -19,7 +20,16 @@ div#content {
 }
 
 span.label.language {
-	line-height: 18.5px;
+
+	> span {
+		
+	}
+	> button.close {
+		float: none;
+		position: relative;
+		top: -1px;
+		right: 0;
+	}
 }
 
 select#languages {
@@ -34,4 +44,9 @@ div#word-edit {
 		max-width: 100%;
 		z-index: 1;
 	}
+}
+
+div#submit-state {
+	position: absolute;
+	right: 0;
 }
