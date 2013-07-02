@@ -45,7 +45,7 @@ word = require('./routes/word');
 
 app = express();
 
-app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.PORT || 80);
 
 app.set('views', __dirname + '/views');
 

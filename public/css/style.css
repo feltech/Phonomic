@@ -6663,6 +6663,10 @@ a.brand {
   padding: 8px 20px 12px 40px;
 }
 
+div#loader {
+  margin-top: 10px;
+}
+
 div#content {
   padding-left: 5px;
   padding-right: 5px;
@@ -6684,8 +6688,7 @@ div#word-edit > div {
   max-width: 100%;
   z-index: 1;
 }
-
-div#submit-state {
+div#word-edit div#submit-state {
   position: absolute;
   right: 0;
 }

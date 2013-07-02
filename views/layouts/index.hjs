@@ -26,12 +26,16 @@
                         <ul class="nav">
                             <li class="active"><a href="/phonetica/">Home</a></li>
                         </ul>
--->						
-                    </div><!--/.nav-collapse -->
+					
+                    </div>
+-->	
+					<div id="loader" class="pull-right">
+						<image src="img/ajax-loader.gif" />
+					</div>
                 </div>
             </div>
         </div>
-            <div id="content">
+           <div id="content">
 			</div>           
 			<hr>
             <footer>

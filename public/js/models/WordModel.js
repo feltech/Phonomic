@@ -2,6 +2,14 @@
 define(['underscore', 'jquery', 'brite'], function(_, $, brite) {
   var WordModel;
   return WordModel = (function() {
+    WordModel.prototype.Languages = "";
+
+    WordModel.prototype.Roman = "";
+
+    WordModel.prototype.Native = "";
+
+    WordModel.prototype.Phonetic = "";
+
     function WordModel(attrs) {
       _.extend(this, attrs);
     }

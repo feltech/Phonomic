@@ -37,16 +37,20 @@ define(['underscore', 'jquery', 'brite', 'templates/WordSearch', 'utils/logger',
       'edit': function(evt, data) {
         var _this = this;
         return this.hideEditView().then(function() {
-          return brite.display('WordEditView', $('#word-edit'), data.word).done(function(editView) {
+          _this.$el.trigger('loader', true);
+          return brite.display('WordEditView', $('#word-edit'), data.word).always(function(editView) {
             _this.editView = editView;
+            return _this.$el.trigger('loader', false);
           });
         });
       },
       'create': function(evt, data) {
         var _this = this;
         return this.hideEditView().then(function() {
-          return brite.display('WordEditView', $('#word-edit'), new WordModel(data)).done(function(editView) {
+          _this.$el.trigger('loader', true);
+          return brite.display('WordEditView', $('#word-edit'), new WordModel(data)).always(function(editView) {
             _this.editView = editView;
+            return _this.$el.trigger('loader', false);
           });
         });
       }

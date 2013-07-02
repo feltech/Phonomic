@@ -3,7 +3,7 @@
 {{#word}}
 		<fieldset>
 			<legend>{{Native}} <button type="button" class="cancel close">&times;</button>&nbsp</legend>
-			<small><span id="word-id" class="muted">{{#ID}}#{{.}}{{/ID}}{{^ID}}new{{/ID}}</span></small>
+			<small><span id="word-id" class="muted">{{#ID}}#{{ID}}{{/ID}}{{^ID}}new{{/ID}}</span></small>
 			<div class="control-group">
 				<label class="control-label" for="roman">Roman</label>
 				<div class="controls">

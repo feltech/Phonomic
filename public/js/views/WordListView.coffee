@@ -36,15 +36,20 @@ define [
 		events:
 			'click; li': (evt)->
 				wordRef = $(evt.currentTarget).bEntity 'Word'
+				@$el.trigger 'loader', true 
 				@dao.cache(ID: parseInt(wordRef.id)).done (word)=>
 					@$el.trigger 'edit', word: word
+					@$el.trigger 'loader', false 
+
 				return false	
 		
 		docEvents: 
 			'search': (evt, data)->
 				if @transition.state() == 'resolved'
+					@$el.trigger 'loader', true 
 					@transition = @hide()
-					@dao.list(data.field, data.text)
+					@dao.list(data.field, data.text).always => @$el.trigger 'loader', false 
+					
 				return
 
 		daoEvents:

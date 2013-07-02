@@ -40,21 +40,23 @@ define [
 			'edit': (evt, data)->
 				return @hideEditView()
 					.then =>
+						@$el.trigger 'loader', true 
 						brite.display('WordEditView', $('#word-edit'), data.word)
-							.done (@editView)=> 
+							.always (@editView)=> @$el.trigger 'loader', false 
 								
 			'create': (evt, data)->
 				return @hideEditView()
 					.then =>
+						@$el.trigger 'loader', true 
 						brite.display('WordEditView', $('#word-edit'), new WordModel(data))
-							.done (@editView)=> 
+							.always (@editView)=> @$el.trigger 'loader', false 
 						
 		daoEvents: {}
 			
 		hideEditView: ()->
 			return $.Deferred().resolve().then =>
 					if @editView 
-						# Hide then empty inner then remove.  Do not simply call @editView.remove()
+						# Hide the empty inner then remove.  Do not simply call @editView.remove()
 						# since that will reset the parent els height, causing FOUS when new edit
 						# view is rendered.
 						return @editView.hide().then ($el)-> 

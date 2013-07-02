@@ -3,13 +3,34 @@ define(['jquery', 'brite', 'views/WordSearchView', 'views/WordListView'], functi
   return brite.registerView('MainView', {
     emptyParent: true
   }, {
+    loadingCount: 0,
     create: function() {
       return "<div>";
     },
     postDisplay: function() {
-      brite.display('WordSearchView', this.$el);
+      brite.display('WordSearchView', this.$el).then(function() {
+        return $('#loader').addClass('hidden');
+      });
       brite.display('WordListView', $('#right-panel'));
       return true;
+    },
+    docEvents: {
+      'loader': function(evt, isShown) {
+        return this.loader(isShown);
+      }
+    },
+    loader: function(isShown) {
+      if (isShown) {
+        this.loadingCount++;
+      } else {
+        this.loadingCount--;
+      }
+      if (this.loadingCount) {
+        $('#loader').removeClass('hidden');
+      } else {
+        $('#loader').addClass('hidden');
+      }
+      return this.loadingCount;
     }
   });
 });

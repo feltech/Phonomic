@@ -4,6 +4,10 @@ define [
 	'brite'
 ], (_, $, brite) ->
 	class WordModel
+		Languages: ""
+		Roman: ""
+		Native: ""
+		Phonetic: ""
 		constructor: (attrs)->
 			_.extend this, attrs
 		get: (id)->

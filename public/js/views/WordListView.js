@@ -45,21 +45,27 @@ define(['underscore', 'jquery', 'brite', 'templates/WordSearchList', 'utils/logg
         var wordRef,
           _this = this;
         wordRef = $(evt.currentTarget).bEntity('Word');
+        this.$el.trigger('loader', true);
         this.dao.cache({
           ID: parseInt(wordRef.id)
         }).done(function(word) {
-          return _this.$el.trigger('edit', {
+          _this.$el.trigger('edit', {
             word: word
           });
+          return _this.$el.trigger('loader', false);
         });
         return false;
       }
     },
     docEvents: {
       'search': function(evt, data) {
+        var _this = this;
         if (this.transition.state() === 'resolved') {
+          this.$el.trigger('loader', true);
           this.transition = this.hide();
-          this.dao.list(data.field, data.text);
+          this.dao.list(data.field, data.text).always(function() {
+            return _this.$el.trigger('loader', false);
+          });
         }
       }
     },

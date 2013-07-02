@@ -96,6 +96,7 @@ define [
 			
 				wordDAO = brite.dao 'Word'
 							
+				@$el.trigger 'loader', true 
 				wordDAO[if @word.ID then 'update' else 'create'](@word).done =>
 					$alert = $('#submit-state').addClass('alert-success').removeClass('alert-warning').removeClass('alert-info');
 					$('strong', $alert).html "Success!" 
@@ -107,6 +108,9 @@ define [
 					$('strong', $alert).html "Failed." 
 					$('span', $alert).html "Could not save changes to the server."
 					$alert.removeClass('invisible')
+				
+				.always => 	@$el.trigger 'loader', false 
+
 				return false;
 					
 		

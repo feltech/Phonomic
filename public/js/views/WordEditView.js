@@ -147,6 +147,7 @@ define(['underscore', 'jquery', 'brite', 'utils/logger', 'templates/WordEdit', '
           opacity: 1
         });
         wordDAO = brite.dao('Word');
+        this.$el.trigger('loader', true);
         wordDAO[this.word.ID ? 'update' : 'create'](this.word).done(function() {
           $alert = $('#submit-state').addClass('alert-success').removeClass('alert-warning').removeClass('alert-info');
           $('strong', $alert).html("Success!");
@@ -162,6 +163,8 @@ define(['underscore', 'jquery', 'brite', 'utils/logger', 'templates/WordEdit', '
           $('strong', $alert).html("Failed.");
           $('span', $alert).html("Could not save changes to the server.");
           return $alert.removeClass('invisible');
+        }).always(function() {
+          return _this.$el.trigger('loader', false);
         });
         return false;
       }
