@@ -53,6 +53,19 @@
 {{/word}}
 				</div>
 			</div>
+			
+{{#captcha}}			
+			<div class="control-group">
+				<div class="controls">
+					<img src="{{{captcha}}}" /><br />
+				</div>
+			</div>
+			<div class="control-group">
+				<div class="controls">
+					<input id="captcha" type="text" placeholder="Type what you see above..." />
+				</div>
+			</div>
+{{/captcha}}		
 			<div class="control-group">
 				<div class="controls">
 					<button type="button" class="btn cancel">Cancel</button>

@@ -6688,7 +6688,7 @@ div#word-edit > div {
   max-width: 100%;
   z-index: 1;
 }
-div#word-edit div#submit-state {
+div#word-edit > div > div#submit-state {
   position: absolute;
   right: 0;
 }

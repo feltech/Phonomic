@@ -18,6 +18,7 @@ http = require 'http'
 path = require 'path'
 moment = require 'moment'
 # Routing.
+captcha = require 'captchagen'
 routes = require './routes'
 user = require './routes/user'
 list = require './routes/list'
@@ -27,7 +28,7 @@ word = require './routes/word'
  Init app.
 ###
 app = express()
-app.set('port', process.env.PORT || 80)
+app.set('port', process.env.PORT || 3000)
 app.set('views', __dirname + '/views')
 app.set('view engine', 'hjs')
 
@@ -39,13 +40,20 @@ if app.get('env') is 'development'
 	app.use express.errorHandler()
 app.use (req, res, next)->
 	console.log "#{(moment().format()).toString 'yyyy-MM-dd'}: #{req.ip}"
-	next()
+	next()	
+
 app.use(express.favicon())
 app.use(express.compress())
 app.use(express.bodyParser())
 #app.use(express.methodOverride())
 app.use(express.cookieParser('your secret here'))
 app.use(express.session())
+app.use (req, res, next)->
+	console.log "Waiting for captcha: #{req.session.captcha}, testing against: #{req.body.captcha}"
+	if req.session.captcha && req.body.captcha == req.session.captcha
+		req.session.isHuman = true
+	next()
+
 app.use(app.router)
 app.use(express.static(path.join(__dirname, 'public')))
 app.use (req, res, next)->
@@ -72,6 +80,17 @@ app.get '/users', user.list
 template.setDir app.get('views')
 app.get "/js/templates/:fileName", template
 app.get '/list/:id', list
+
+app.get '/captcha', (req, res, next)->
+	if req.session.isHuman
+		res.send("")
+	else	
+		capt = captcha.generate()
+		req.session.captcha = capt.text()
+		console.log "Sending captcha:"
+		console.log "Generating captcha: #{req.session.captcha}"
+		res.send(capt.uri())
+	
 app.post "/word/:verb", word
 
 ###

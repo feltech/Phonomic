@@ -12,26 +12,45 @@ squel = require('squel');
 dao = new WordDAO();
 
 wordRoute = function(req, res, next) {
+  console.log("Word attempting " + req.params.verb);
   switch (req.params.verb) {
     case 'search':
       return dao.list(req.body.field, req.body.value).done(function(json) {
         return res.send(json);
       });
     case 'create':
-      return dao.create(req.body).done(function(word) {
+      return deferred(function(defer) {
+        if (req.session.isHuman) {
+          return defer.resolve();
+        } else {
+          return defer.reject();
+        }
+      }).then(function() {
+        return dao.create(req.body);
+      }).done(function(word) {
         res.contentType('.js');
         console.log("create word " + req.body.Roman + " complete. New ID=" + word.ID);
         return res.send(word);
-      }).fail(function(err) {
-        throw err;
+      }).fail(function() {
+        console.log("Word create failed. human=" + req.session.isHuman);
+        return res.send(401);
       });
     case 'update':
-      return dao.update(req.body).done(function(word) {
+      return deferred(function(defer) {
+        if (req.session.isHuman) {
+          return defer.resolve();
+        } else {
+          return defer.reject();
+        }
+      }).then(function() {
+        return dao.update(req.body);
+      }).done(function(word) {
         res.contentType('.js');
         console.log("update word " + req.body.Roman + " complete");
         return res.send(word);
-      }).fail(function(err) {
-        throw err;
+      }).fail(function() {
+        console.log("Word update failed. human=" + req.session.isHuman);
+        return res.send(401);
       });
     default:
       return next();

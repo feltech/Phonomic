@@ -10,17 +10,18 @@ instance = null
 module.exports = class Database
 	constructor: ()->
 		# Create and store the connection.
-		@connection = mysql.createConnection
+	# Query the database with given sql and option attributes hash, using
+	# the promise idiom for returning responses.
+	query: (sql, attrs)->
+		connection = mysql.createConnection
 				host: 'localhost'
 				user: 'root'
 				password: 'dave'
 				database: 'phonetica'
-	# Query the database with given sql and option attributes hash, using
-	# the promise idiom for returning responses.
-	query: (sql, attrs)->
+	
 		return deferred (defer)=>
 			try
-				query = @connection.query sql, attrs, (err, result)=>
+				query = connection.query sql, attrs, (err, result)=>
 					console.log if result then "#{result.length} records found" else err
 					if err then defer.reject(err) else defer.resolve(result)
 				isRetry = false

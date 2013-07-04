@@ -20,8 +20,12 @@ define [
 			return languageDAO.list().then (languages)=>
 				languageIDs = _.compact word.Languages?.split '\t'
 				languageIDs = _(languageIDs).map (id)-> parseInt(id)
-				wordRender.Languages = _(languageIDs).map (id)-> _(languages).findWhere(ID: id)	
-				return editTmpl.render {word: wordRender, languages: languages}, langList: langTmpl
+				wordRender.Languages = _(languageIDs).map (id)-> _(languages).findWhere(ID: id)
+				return languages
+			.then (languages)->
+				return $.get('/captcha').then (data)-> captcha: data, languages: languages
+			.then (data)->	
+				return editTmpl.render { word: wordRender, languages: data.languages, captcha: data.captcha || undefined }, langList: langTmpl
 
 		init: ->
 			@$el.hide()

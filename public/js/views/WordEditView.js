@@ -20,9 +20,19 @@ define(['underscore', 'jquery', 'brite', 'utils/logger', 'templates/WordEdit', '
             ID: id
           });
         });
+        return languages;
+      }).then(function(languages) {
+        return $.get('/captcha').then(function(data) {
+          return {
+            captcha: data,
+            languages: languages
+          };
+        });
+      }).then(function(data) {
         return editTmpl.render({
           word: wordRender,
-          languages: languages
+          languages: data.languages,
+          captcha: data.captcha || void 0
         }, {
           langList: langTmpl
         });

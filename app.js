@@ -3,7 +3,7 @@
  Debugger.
 */
 
-var app, exec, express, hogan, http, list, moment, path, routes, sys, template, user, word;
+var app, captcha, exec, express, hogan, http, list, moment, path, routes, sys, template, user, word;
 
 process.kill(process.pid, 'SIGUSR1');
 
@@ -30,6 +30,8 @@ path = require('path');
 
 moment = require('moment');
 
+captcha = require('captchagen');
+
 routes = require('./routes');
 
 user = require('./routes/user');
@@ -45,7 +47,7 @@ word = require('./routes/word');
 
 app = express();
 
-app.set('port', process.env.PORT || 80);
+app.set('port', process.env.PORT || 3000);
 
 app.set('views', __dirname + '/views');
 
@@ -76,6 +78,14 @@ app.use(express.bodyParser());
 app.use(express.cookieParser('your secret here'));
 
 app.use(express.session());
+
+app.use(function(req, res, next) {
+  console.log("Waiting for captcha: " + req.session.captcha + ", testing against: " + req.body.captcha);
+  if (req.session.captcha && req.body.captcha === req.session.captcha) {
+    req.session.isHuman = true;
+  }
+  return next();
+});
 
 app.use(app.router);
 
@@ -113,6 +123,19 @@ template.setDir(app.get('views'));
 app.get("/js/templates/:fileName", template);
 
 app.get('/list/:id', list);
+
+app.get('/captcha', function(req, res, next) {
+  var capt;
+  if (req.session.isHuman) {
+    return res.send("");
+  } else {
+    capt = captcha.generate();
+    req.session.captcha = capt.text();
+    console.log("Sending captcha:");
+    console.log("Generating captcha: " + req.session.captcha);
+    return res.send(capt.uri());
+  }
+});
 
 app.post("/word/:verb", word);
 

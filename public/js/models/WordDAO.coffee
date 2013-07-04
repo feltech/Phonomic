@@ -12,6 +12,7 @@ define [
 			return 'Word'
 		get: (id)->
 		create: (data)->
+			_(data).extend captcha: $('#captcha').val()
 			if data instanceof WordModel
 				return $.post("word/create", data, null, "json")
 				.then (data)=>
@@ -30,6 +31,7 @@ define [
 		remove: (id)->
 		removeMany: (ids)->
 		update: (data)->	
+			_(data).extend captcha: $('#captcha').val()
 			if data instanceof WordModel
 				return $.post("word/update", data, null, "json")
 				.then (data)=>

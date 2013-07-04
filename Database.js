@@ -10,21 +10,21 @@ isRetry = false;
 instance = null;
 
 module.exports = Database = (function() {
-  function Database() {
-    this.connection = mysql.createConnection({
+  function Database() {}
+
+  Database.prototype.query = function(sql, attrs) {
+    var connection,
+      _this = this;
+    connection = mysql.createConnection({
       host: 'localhost',
       user: 'root',
       password: 'dave',
       database: 'phonetica'
     });
-  }
-
-  Database.prototype.query = function(sql, attrs) {
-    var _this = this;
     return deferred(function(defer) {
       var e, query;
       try {
-        query = _this.connection.query(sql, attrs, function(err, result) {
+        query = connection.query(sql, attrs, function(err, result) {
           console.log(result ? "" + result.length + " records found" : err);
           if (err) {
             return defer.reject(err);
