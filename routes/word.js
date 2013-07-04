@@ -23,7 +23,7 @@ wordRoute = function(req, res, next) {
         if (req.session.isHuman) {
           return defer.resolve();
         } else {
-          return defer.reject();
+          return defer.reject(401);
         }
       }).then(function() {
         return dao.create(req.body);
@@ -40,7 +40,7 @@ wordRoute = function(req, res, next) {
         if (req.session.isHuman) {
           return defer.resolve();
         } else {
-          return defer.reject();
+          return defer.reject(401);
         }
       }).then(function() {
         return dao.update(req.body);
@@ -48,9 +48,9 @@ wordRoute = function(req, res, next) {
         res.contentType('.js');
         console.log("update word " + req.body.Roman + " complete");
         return res.send(word);
-      }).fail(function() {
+      }).fail(function(errCode) {
         console.log("Word update failed. human=" + req.session.isHuman);
-        return res.send(401);
+        return res.send(errCode || 500);
       });
     default:
       return next();

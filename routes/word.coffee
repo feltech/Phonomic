@@ -14,7 +14,7 @@ wordRoute = (req, res, next)->
 
 		when 'create'
 			deferred (defer)->
-				if req.session.isHuman then defer.resolve() else defer.reject()	
+				if req.session.isHuman then defer.resolve() else defer.reject(401)	
 			.then -> 
 				return dao.create(req.body)
 			.done (word)->
@@ -27,16 +27,16 @@ wordRoute = (req, res, next)->
 
 		when 'update'
 			deferred (defer)->	
-				if req.session.isHuman then defer.resolve() else defer.reject()	
+				if req.session.isHuman then defer.resolve() else defer.reject(401)	
 			.then -> 
 				return dao.update(req.body)
 			.done (word)->
 				res.contentType('.js')
 				console.log "update word #{req.body.Roman} complete"
 				res.send(word)
-			.fail ->
+			.fail (errCode)->
 				console.log "Word update failed. human=#{req.session.isHuman}"
-				res.send(401)
+				res.send(errCode || 500)
 		else
 			next()
 

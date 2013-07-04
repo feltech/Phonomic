@@ -12,7 +12,7 @@ define [
 			return 'Word'
 		get: (id)->
 		create: (data)->
-			_(data).extend captcha: $('#captcha').val()
+			$('#error-log').empty()
 			if data instanceof WordModel
 				return $.post("word/create", data, null, "json")
 				.then (data)=>
@@ -31,7 +31,7 @@ define [
 		remove: (id)->
 		removeMany: (ids)->
 		update: (data)->	
-			_(data).extend captcha: $('#captcha').val()
+			$('#error-log').empty()
 			if data instanceof WordModel
 				return $.post("word/update", data, null, "json")
 				.then (data)=>
@@ -50,6 +50,7 @@ define [
 				
 		list: (field, value)->
 			value = escape(value)
+			$('#error-log').empty()
 			return $.post 'word/search', 
 					field: field, value: value, 
 					() -> # - empty function required to force jquery to use 4th (dataType) parameter and auto-parse response as json.

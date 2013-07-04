@@ -14,9 +14,7 @@ define(['underscore', 'jquery', 'brite', 'models/WordModel'], function(_, $, bri
 
     WordDAO.prototype.create = function(data) {
       var _this = this;
-      _(data).extend({
-        captcha: $('#captcha').val()
-      });
+      $('#error-log').empty();
       if (data instanceof WordModel) {
         return $.post("word/create", data, null, "json").then(function(data) {
           var word;
@@ -46,9 +44,7 @@ define(['underscore', 'jquery', 'brite', 'models/WordModel'], function(_, $, bri
 
     WordDAO.prototype.update = function(data) {
       var _this = this;
-      _(data).extend({
-        captcha: $('#captcha').val()
-      });
+      $('#error-log').empty();
       if (data instanceof WordModel) {
         return $.post("word/update", data, null, "json").then(function(data) {
           var word;
@@ -75,6 +71,7 @@ define(['underscore', 'jquery', 'brite', 'models/WordModel'], function(_, $, bri
     WordDAO.prototype.list = function(field, value) {
       var _this = this;
       value = escape(value);
+      $('#error-log').empty();
       return $.post('word/search', {
         field: field,
         value: value

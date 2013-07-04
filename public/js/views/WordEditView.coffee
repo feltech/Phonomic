@@ -92,6 +92,8 @@ define [
 					Roman: _.clean $('#roman').val() 
 					Native: _.clean $('#native').val()
 					Phonetic: _.clean $('#phonetic').val()
+					captcha: $('#captcha').val()
+
 				$alert = $('#submit-state').removeClass('alert-success').removeClass('alert-warning').addClass('alert-info');
 				
 				$('strong', $alert).html "Sending." 
@@ -107,10 +109,14 @@ define [
 					$('span', $alert).html "The changes have been sucessfuly saved to the server."
 					$alert.transition opacity: 0, delay: 3000, ->
 						$alert.addClass 'invisible'
-				.fail =>
+				.fail (xhr, error, text)=>
 					$alert = $('#submit-state').removeClass('alert-success').addClass('alert-warning').removeClass('alert-info');
 					$('strong', $alert).html "Failed." 
-					$('span', $alert).html "Could not save changes to the server."
+					if xhr.status == 401
+						$('span', $alert).html "Sorry, the text you entered does not match the image above. Please try again."
+					else
+						$('span', $alert).html "A server error occurred whilst trying to save your changes."
+						
 					$alert.removeClass('invisible')
 				
 				.always => 	@$el.trigger 'loader', false 
