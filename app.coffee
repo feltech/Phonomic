@@ -28,7 +28,9 @@ word = require './routes/word'
  Init app.
 ###
 app = express()
-app.set('port', process.env.PORT || 3000)
+port = process.argv[2] || process.env.PORT || 3000
+console.log "Using port #{port}"
+app.set('port', port)
 app.set('views', __dirname + '/views')
 app.set('view engine', 'hjs')
 
@@ -38,7 +40,12 @@ app.set('view engine', 'hjs')
 app.use(express.logger('dev'))
 if app.get('env') is 'development'
 	app.use express.errorHandler()
+
+lastIP = ""
 app.use (req, res, next)->
+	if req.ip != lastIP
+		lastIP = req.ip
+		console.log "\n\n#####################################################" 
 	console.log "#{(moment().format()).toString 'yyyy-MM-dd'}: #{req.ip}"
 	next()	
 
@@ -49,9 +56,17 @@ app.use(express.bodyParser())
 app.use(express.cookieParser('your secret here'))
 app.use(express.session())
 app.use (req, res, next)->
-	console.log "Waiting for captcha: #{req.session.captcha}, testing against: #{req.body.captcha}"
-	if req.session.captcha && req.body.captcha == req.session.captcha
-		req.session.isHuman = true
+	if not req.session.isHuman
+		console.log "Session humanity not verified."
+		if req.session.captcha
+			if req.body.captcha == req.session.captcha
+				req.session.isHuman = true
+				console.log "Captcha #{req.session.captcha} correct, humanity verified."
+			else
+				console.log "Captcha #{req.session.captcha} incorrect (#{req.body.captcha} sent), humanity uncertain."
+	else
+		console.log "Session humanity verified."
+		
 	next()
 
 app.use(app.router)
@@ -87,7 +102,6 @@ app.get '/captcha', (req, res, next)->
 	else	
 		capt = captcha.generate()
 		req.session.captcha = capt.text()
-		console.log "Sending captcha:"
 		console.log "Generating captcha: #{req.session.captcha}"
 		res.send(capt.uri())
 	

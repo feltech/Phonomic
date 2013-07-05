@@ -21,9 +21,9 @@ wordRoute = (req, res, next)->
 				res.contentType('.js')
 				console.log "create word #{req.body.Roman} complete. New ID=#{word.ID}"
 				res.send(word)
-			.fail ->
-				console.log "Word create failed. human=#{req.session.isHuman}"
-				res.send(401)
+			.fail (errCode)->
+				console.log "Word create failed: #{errCode}"
+				res.send(errCode || 500)
 
 		when 'update'
 			deferred (defer)->	
@@ -35,7 +35,7 @@ wordRoute = (req, res, next)->
 				console.log "update word #{req.body.Roman} complete"
 				res.send(word)
 			.fail (errCode)->
-				console.log "Word update failed. human=#{req.session.isHuman}"
+				console.log "Word update failed: #{errCode}"
 				res.send(errCode || 500)
 		else
 			next()

@@ -31,9 +31,9 @@ wordRoute = function(req, res, next) {
         res.contentType('.js');
         console.log("create word " + req.body.Roman + " complete. New ID=" + word.ID);
         return res.send(word);
-      }).fail(function() {
-        console.log("Word create failed. human=" + req.session.isHuman);
-        return res.send(401);
+      }).fail(function(errCode) {
+        console.log("Word create failed: " + errCode);
+        return res.send(errCode || 500);
       });
     case 'update':
       return deferred(function(defer) {
@@ -49,7 +49,7 @@ wordRoute = function(req, res, next) {
         console.log("update word " + req.body.Roman + " complete");
         return res.send(word);
       }).fail(function(errCode) {
-        console.log("Word update failed. human=" + req.session.isHuman);
+        console.log("Word update failed: " + errCode);
         return res.send(errCode || 500);
       });
     default:

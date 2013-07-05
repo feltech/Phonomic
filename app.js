@@ -3,7 +3,7 @@
  Debugger.
 */
 
-var app, captcha, exec, express, hogan, http, list, moment, path, routes, sys, template, user, word;
+var app, captcha, exec, express, hogan, http, lastIP, list, moment, path, port, routes, sys, template, user, word;
 
 process.kill(process.pid, 'SIGUSR1');
 
@@ -47,7 +47,11 @@ word = require('./routes/word');
 
 app = express();
 
-app.set('port', process.env.PORT || 3000);
+port = process.argv[2] || process.env.PORT || 3000;
+
+console.log("Using port " + port);
+
+app.set('port', port);
 
 app.set('views', __dirname + '/views');
 
@@ -64,7 +68,13 @@ if (app.get('env') === 'development') {
   app.use(express.errorHandler());
 }
 
+lastIP = "";
+
 app.use(function(req, res, next) {
+  if (req.ip !== lastIP) {
+    lastIP = req.ip;
+    console.log("\n\n#####################################################");
+  }
   console.log("" + ((moment().format()).toString('yyyy-MM-dd')) + ": " + req.ip);
   return next();
 });
@@ -80,9 +90,18 @@ app.use(express.cookieParser('your secret here'));
 app.use(express.session());
 
 app.use(function(req, res, next) {
-  console.log("Waiting for captcha: " + req.session.captcha + ", testing against: " + req.body.captcha);
-  if (req.session.captcha && req.body.captcha === req.session.captcha) {
-    req.session.isHuman = true;
+  if (!req.session.isHuman) {
+    console.log("Session humanity not verified.");
+    if (req.session.captcha) {
+      if (req.body.captcha === req.session.captcha) {
+        req.session.isHuman = true;
+        console.log("Captcha " + req.session.captcha + " correct, humanity verified.");
+      } else {
+        console.log("Captcha " + req.session.captcha + " incorrect (" + req.body.captcha + " sent), humanity uncertain.");
+      }
+    }
+  } else {
+    console.log("Session humanity verified.");
   }
   return next();
 });
@@ -131,7 +150,6 @@ app.get('/captcha', function(req, res, next) {
   } else {
     capt = captcha.generate();
     req.session.captcha = capt.text();
-    console.log("Sending captcha:");
     console.log("Generating captcha: " + req.session.captcha);
     return res.send(capt.uri());
   }

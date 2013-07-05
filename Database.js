@@ -10,42 +10,51 @@ isRetry = false;
 instance = null;
 
 module.exports = Database = (function() {
-  function Database() {}
+  function Database() {
+    this.db();
+  }
+
+  Database.prototype.db = function() {
+    var _ref, _ref1, _ref2, _ref3;
+    if (((_ref = this.connection) != null ? (_ref1 = _ref._socket) != null ? _ref1.readable : void 0 : void 0) && ((_ref2 = this.connection) != null ? (_ref3 = _ref2._socket) != null ? _ref3.writable : void 0 : void 0)) {
+      return this.connection;
+    } else {
+      this.connection = mysql.createConnection({
+        host: 'localhost',
+        user: 'root',
+        password: 'dave',
+        database: 'phonetica'
+      });
+      this.connection.connect(function(err) {
+        if (err) {
+          return console.log("SQL CONNECT ERROR: " + err);
+        } else {
+          return console.log("SQL CONNECT SUCCESSFUL.");
+        }
+      });
+      this.connection.on("close", function(err) {
+        return console.log("SQL CONNECTION CLOSED.");
+      });
+      return this.connection.on("error", function(err) {
+        return console.log("SQL CONNECTION ERROR: " + err);
+      });
+    }
+  };
 
   Database.prototype.query = function(sql, attrs) {
-    var connection,
-      _this = this;
-    connection = mysql.createConnection({
-      host: 'localhost',
-      user: 'root',
-      password: 'dave',
-      database: 'phonetica'
-    });
+    var _this = this;
     return deferred(function(defer) {
-      var e, query;
-      try {
-        query = connection.query(sql, attrs, function(err, result) {
-          console.log(result ? "" + result.length + " records found" : err);
-          if (err) {
-            return defer.reject(err);
-          } else {
-            return defer.resolve(result);
-          }
-        });
-        isRetry = false;
-        return console.log("Database. " + query.sql);
-      } catch (_error) {
-        e = _error;
-        if (!isRetry) {
-          console.warn("WARN: Database query failed, retrying. " + query.sql + " :: " + e.message + " :: " + e.stack);
-          isRetry = true;
-          instance = null;
-          return Database.Instance().query(sql, attrs);
+      var query;
+      return query = _this.db().query(sql, attrs, function(err, result) {
+        console.log(result ? "" + (result.length || JSON.stringify(result)) + " records found" : err);
+        if (err) {
+          return defer.reject(err);
         } else {
-          return console.error("ERROR: Database query failed, retry failed. " + query.sql + " :: " + e.message + " :: " + e.stack);
+          return defer.resolve(result);
         }
-      }
+      });
     });
+    return console.log("SQL QUERY: " + query.sql);
   };
 
   Database.Instance = function() {

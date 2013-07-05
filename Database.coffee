@@ -8,34 +8,38 @@ instance = null
 
 # Database wrapper utility class.
 module.exports = class Database
-	constructor: ()->
-		# Create and store the connection.
-	# Query the database with given sql and option attributes hash, using
-	# the promise idiom for returning responses.
-	query: (sql, attrs)->
-		connection = mysql.createConnection
+	constructor: ->
+		@db()
+	# Create and store the connection.
+	db: ->
+		if (@connection?._socket?.readable && @connection?._socket?.writable)
+			return @connection
+		else			
+			@connection = mysql.createConnection
 				host: 'localhost'
 				user: 'root'
 				password: 'dave'
 				database: 'phonetica'
-	
-		return deferred (defer)=>
-			try
-				query = connection.query sql, attrs, (err, result)=>
-					console.log if result then "#{result.length} records found" else err
-					if err then defer.reject(err) else defer.resolve(result)
-				isRetry = false
-				console.log "Database. #{query.sql}"
-			catch e
-				if not isRetry
-					console.warn "WARN: Database query failed, retrying. #{query.sql} :: #{e.message} :: #{e.stack}"
-					isRetry = true
-					instance = null
-					Database.Instance().query(sql, attrs)
+			@connection.connect (err)->
+				if (err)
+					console.log "SQL CONNECT ERROR: #{err}"
 				else
-					console.error "ERROR: Database query failed, retry failed. #{query.sql} :: #{e.message} :: #{e.stack}"
+					console.log "SQL CONNECT SUCCESSFUL."				
+			@connection.on "close", (err)->
+				console.log "SQL CONNECTION CLOSED."
+			@connection.on "error", (err)->
+				console.log "SQL CONNECTION ERROR: #{err}"
+		
+	# Query the database with given sql and option attributes hash, using
+	# the promise idiom for returning responses.
+	query: (sql, attrs)->
+
+		return deferred (defer)=>
+			query = @db().query sql, attrs, (err, result)=>
+				console.log if result then "#{result.length || JSON.stringify(result)} records found" else err
+				if err then defer.reject(err) else defer.resolve(result)
+
+		console.log "SQL QUERY: #{query.sql}"
 			
 	@Instance: ()->
 		if instance then instance else instance = new Database()			
-			
-			
