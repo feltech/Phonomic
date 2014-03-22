@@ -1,10 +1,12 @@
 ###
  Debugger.
 ###
-process.kill(process.pid, 'SIGUSR1');
-sys = require('sys')
-exec = require('child_process').exec;
-exec('node-inspector')
+if (!process.argv[2])
+	process.kill(process.pid, 'SIGUSR1');
+	sys = require('sys')
+	exec = require('child_process').exec;
+	exec('node-inspector')
+
 
 ###
  Module dependencies.
@@ -13,6 +15,14 @@ exec('node-inspector')
 express = require 'express'
 hogan = require 'hogan.js'
 template = require './routes/template'
+fcgi = require('connect-fastcgi');
+net  = require 'net'
+FCGI = require 'fastcgi-stream'
+
+fcgiSocket = net.connect 7000, 'localhost', ->
+	console.log JSON.stringify(arguments)
+
+
 # System
 http = require 'http'
 path = require 'path'
@@ -46,7 +56,7 @@ app.use (req, res, next)->
 	if req.ip != lastIP
 		lastIP = req.ip
 		console.log "\n\n#####################################################" 
-	console.log "#{(moment().format()).toString 'yyyy-MM-dd'}: #{req.ip}"
+	console.log "\n#{(moment().format()).toString 'yyyy-MM-dd'}: #{req.ip}"
 	next()	
 
 app.use(express.favicon())
@@ -55,6 +65,8 @@ app.use(express.bodyParser())
 #app.use(express.methodOverride())
 app.use(express.cookieParser('your secret here'))
 app.use(express.session())
+
+# Process captcha, if applicable
 app.use (req, res, next)->
 	if not req.session.isHuman
 		console.log "Session humanity not verified."
@@ -71,6 +83,7 @@ app.use (req, res, next)->
 
 app.use(app.router)
 app.use(express.static(path.join(__dirname, 'public')))
+# 404 - Not found
 app.use (req, res, next)->
 	console.log "404 requesting #{req.url}"
 	res.status(404);
@@ -106,6 +119,24 @@ app.get '/captcha', (req, res, next)->
 		res.send(capt.uri())
 	
 app.post "/word/:verb", word
+
+app.get '/fcgi', fcgi(fastcgiPort: 7000, fastcgiHost: 'localhost', root: "./")
+
+app.get '/fcgis', (req, res, next)->
+	console.log "Sending to fcgi"
+	fcgiStream = new FCGI.FastCGIStream(fcgiSocket);
+	fcgiStream.on "record", (requestId, record)->
+		console.log "RECOIRD: " + requestId + " = " + JSON.stringify(record) 
+		if (record.data)
+			str = ""
+			for c in record.data
+				str += String.fromCharCode(c)
+			res.send(str)
+	fcgiStream.writeRecord 6532, new FCGI.records.BeginRequest(FCGI.records.BeginRequest.roles.FILTER, FCGI.records.BeginRequest.flags.KEEP_CONN)
+	fcgiStream.writeRecord 6532, new FCGI.records.EndRequest()
+#	fcgiStream.writeRecord 6532, new FCGI.records.EndRequest()
+	
+
 
 ###
  Start server.

@@ -7,6 +7,11 @@ define(['underscore', 'jquery', 'brite', 'templates/WordSearch', 'utils/logger',
       return searchTmpl.render();
     },
     events: {
+      'change; #form-search > input': function(evt) {
+        var $el;
+        $el = $(evt.currentTarget);
+        return $el.val(_($el.val()).trim());
+      },
       'submit; #form-search': function(evt) {
         var $target, text;
         evt.preventDefault();

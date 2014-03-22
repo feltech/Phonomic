@@ -19,6 +19,17 @@ define(['jquery', 'brite', 'views/WordSearchView', 'views/WordListView'], functi
         return this.loader(isShown);
       }
     },
+    daoEvents: {
+      'result; Word': function(evt) {
+        if (evt.daoEvent.action === 'list' && $('#splash').length) {
+          return $('#splash').transition({
+            opacity: 0
+          }, 100, function() {
+            return $('#splash').remove();
+          });
+        }
+      }
+    },
     loader: function(isShown) {
       if (isShown) {
         this.loadingCount++;

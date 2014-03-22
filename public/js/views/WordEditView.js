@@ -4,12 +4,12 @@ define(['underscore', 'jquery', 'brite', 'utils/logger', 'templates/WordEdit', '
   transitTime = 200;
   return brite.registerView('WordEditView', {
     create: function(word) {
-      var languageDAO, wordRender,
+      var wordRender,
         _this = this;
       this.word = word;
+      this.alertCount = 0;
       wordRender = _.clone(this.word);
-      languageDAO = brite.dao("Language");
-      return languageDAO.list().then(function(languages) {
+      return brite.dao("Language").list().then(function(languages) {
         var languageIDs, _ref;
         languageIDs = _.compact((_ref = word.Languages) != null ? _ref.split('\t') : void 0);
         languageIDs = _(languageIDs).map(function(id) {
@@ -20,8 +20,6 @@ define(['underscore', 'jquery', 'brite', 'utils/logger', 'templates/WordEdit', '
             ID: id
           });
         });
-        return languages;
-      }).then(function(languages) {
         return $.get('/captcha').then(function(data) {
           return {
             captcha: data,
@@ -45,19 +43,30 @@ define(['underscore', 'jquery', 'brite', 'utils/logger', 'templates/WordEdit', '
       return this.$el.parent().height('auto');
     },
     postDisplay: function() {
-      var sourceY;
+      var sourceY,
+        _this = this;
       sourceY = $(window).height() + $(window).scrollTop() + this.$el.parent().height();
       if (log('trace')) {
         console.log("WordEditView transitioning from y=" + sourceY);
       }
       this.$el.parent().height(this.$el.height());
-      this.$el.css({
-        y: sourceY,
-        opacity: 0.5
-      }).show().transition({
-        y: 0,
-        opacity: 1
-      }, transitTime, 'snap');
+      return $.Deferred(function(defer) {
+        return _this.$el.css({
+          y: sourceY,
+          opacity: 0.5
+        }).show().transition({
+          y: 0,
+          opacity: 1
+        }, transitTime, 'snap', function() {
+          return defer.resolve();
+        });
+      }).done(function() {
+        var offset;
+        offset = Math.max(_this.$el.offset().top - 100, 0);
+        return $('html, body').animate({
+          scrollTop: "" + offset + "px"
+        }, 'slow');
+      });
     },
     resolveWordLanguages: function() {
       var languageDAO,
@@ -96,6 +105,42 @@ define(['underscore', 'jquery', 'brite', 'utils/logger', 'templates/WordEdit', '
         var _ref;
         return (_ref = _this.$el) != null ? _ref.parent().bEmpty() : void 0;
       });
+    },
+    showAlert: function(type, title, text) {
+      var $alert;
+      $alert = $('#submit-state');
+      this.alertCount++;
+      return this.resetAlert().then(function() {
+        $alert.addClass("alert-" + type);
+        $('strong', $alert).html(title);
+        $('span', $alert).html(text);
+        return $alert.removeClass('invisible');
+      });
+    },
+    resetAlert: function(delay) {
+      var $alert, alertCount, defer,
+        _this = this;
+      $alert = $('#submit-state');
+      alertCount = this.alertCount;
+      defer = $.Deferred().resolve();
+      if (delay) {
+        defer = defer.then(function() {
+          return $.Deferred(function(defer) {
+            return _.delay(function() {
+              if ($alert.is('.invisible') || alertCount !== _this.alertCount) {
+                return defer.reject();
+              } else {
+                return defer.resolve();
+              }
+            }, delay);
+          });
+        });
+      }
+      return defer.then(function() {
+        return $alert.addClass('invisible').removeClass('alert-success').removeClass('alert-warning').removeClass('alert-info');
+      }, function() {
+        return $.Deferred().resolve();
+      }).promise();
     },
     events: {
       'click; button.cancel': function(evt) {
@@ -142,8 +187,7 @@ define(['underscore', 'jquery', 'brite', 'utils/logger', 'templates/WordEdit', '
         });
       },
       'submit; #form-edit': function(evt) {
-        var $alert, wordDAO,
-          _this = this;
+        var _this = this;
         evt.preventDefault();
         _(this.word).extend({
           Roman: _.clean($('#roman').val()),
@@ -151,35 +195,17 @@ define(['underscore', 'jquery', 'brite', 'utils/logger', 'templates/WordEdit', '
           Phonetic: _.clean($('#phonetic').val()),
           captcha: $('#captcha').val()
         });
-        $alert = $('#submit-state').removeClass('alert-success').removeClass('alert-warning').addClass('alert-info');
-        $('strong', $alert).html("Sending.");
-        $('span', $alert).html("The changes are being sent to the server, please wait...");
-        $alert.removeClass('invisible').css({
-          opacity: 1
-        });
-        wordDAO = brite.dao('Word');
         this.$el.trigger('loader', true);
-        wordDAO[this.word.ID ? 'update' : 'create'](this.word).done(function() {
-          $alert = $('#submit-state').addClass('alert-success').removeClass('alert-warning').removeClass('alert-info');
-          $('strong', $alert).html("Success!");
-          $('span', $alert).html("The changes have been sucessfuly saved to the server.");
-          return $alert.transition({
-            opacity: 0,
-            delay: 3000
-          }, function() {
-            return $alert.addClass('invisible');
-          });
-        }).fail(function(xhr, error, text) {
-          $alert = $('#submit-state').removeClass('alert-success').addClass('alert-warning').removeClass('alert-info');
-          $('strong', $alert).html("Failed.");
-          if (xhr.status === 401) {
-            $('span', $alert).html("Sorry, the text you entered does not match the image above. Please try again.");
-          } else {
-            $('span', $alert).html("A server error occurred whilst trying to save your changes.");
-          }
-          return $alert.removeClass('invisible');
+        this.showAlert('info', "Sending.", "The changes are being sent to the server, please wait...").then(function() {
+          return brite.dao('Word')[_this.word.ID ? 'update' : 'create'](_this.word);
+        }).then(function() {
+          return _this.showAlert('success', "Success!", "The changes have been sucessfuly saved to the server.");
         }).always(function() {
           return _this.$el.trigger('loader', false);
+        }).then(function() {
+          return _this.resetAlert(5000);
+        }).fail(function(xhr, error, text) {
+          return _this.showAlert('warning', "Failed.", xhr.status === 401 ? "Sorry, the text you entered does not match the captcha text above, please try again." : "A server error occurred whilst trying to save your changes.");
         });
         return false;
       }

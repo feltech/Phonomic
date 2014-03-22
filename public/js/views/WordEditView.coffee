@@ -15,18 +15,20 @@ define [
 
 	brite.registerView 'WordEditView',
 		create: (@word)->
+			@alertCount = 0
+			# Create clone of word data to mutate for rendering.
 			wordRender = _.clone @word
-			languageDAO = brite.dao "Language"
-			return languageDAO.list().then (languages)=>
+			# Get language data to expand word languages for rendering.
+			return brite.dao("Language").list().then (languages)=>
+				# Parse list of IDs of languages in Language table that this word references.
 				languageIDs = _.compact word.Languages?.split '\t'
 				languageIDs = _(languageIDs).map (id)-> parseInt(id)
+				# Replace list of language IDs with actual language objects.
 				wordRender.Languages = _(languageIDs).map (id)-> _(languages).findWhere(ID: id)
-				return languages
-			.then (languages)->
+				# 
 				return $.get('/captcha').then (data)-> captcha: data, languages: languages
 			.then (data)->	
 				return editTmpl.render { word: wordRender, languages: data.languages, captcha: data.captcha || undefined }, langList: langTmpl
-
 		init: ->
 			@$el.hide()
 			return
@@ -37,9 +39,15 @@ define [
 			sourceY = $(window).height() + $(window).scrollTop() + @$el.parent().height()
 			console.log "WordEditView transitioning from y=#{sourceY}" if log('trace')
 			@$el.parent().height @$el.height()
-			@$el.css(y: sourceY, opacity: 0.5)
-				.show()
-				.transition y: 0, opacity: 1, transitTime, 'snap'
+			return $.Deferred (defer)=>
+				@$el.css(y: sourceY, opacity: 0.5)
+					.show()
+					.transition y: 0, opacity: 1, transitTime, 'snap', ->
+						defer.resolve()
+			.done =>
+				offset = Math.max(@$el.offset().top - 100, 0)
+				$('html, body').animate(scrollTop: "#{offset}px",'slow')
+		
 			return
 			
 		resolveWordLanguages: ->
@@ -61,6 +69,32 @@ define [
 		remove: ->
 			@hide().then => @$el?.parent().bEmpty()
 		
+		showAlert: (type, title, text)->
+			$alert = $('#submit-state')
+			@alertCount++
+			@resetAlert().then ->
+				$alert.addClass "alert-#{type}" 
+				$('strong', $alert).html title
+				$('span', $alert).html text
+				$alert.removeClass('invisible')
+				
+		resetAlert: (delay)->
+			$alert = $('#submit-state')
+			alertCount = @alertCount
+			defer = $.Deferred().resolve()
+			if delay
+				defer = defer.then => $.Deferred (defer) => _.delay =>
+					if $alert.is('.invisible') or alertCount != @alertCount
+						defer.reject()
+					else 
+						defer.resolve()
+				, delay
+			return defer.then -> 
+				$alert.addClass('invisible').removeClass('alert-success').removeClass('alert-warning').removeClass('alert-info')
+			, ->
+				$.Deferred().resolve()
+			.promise()
+				
 		events:	
 			'click; button.cancel': (evt)->
 				@remove()
@@ -93,33 +127,26 @@ define [
 					Native: _.clean $('#native').val()
 					Phonetic: _.clean $('#phonetic').val()
 					captcha: $('#captcha').val()
-
-				$alert = $('#submit-state').removeClass('alert-success').removeClass('alert-warning').addClass('alert-info');
-				
-				$('strong', $alert).html "Sending." 
-				$('span', $alert).html "The changes are being sent to the server, please wait..."
-				$alert.removeClass('invisible').css(opacity: 1)
-			
-				wordDAO = brite.dao 'Word'
-							
+					
 				@$el.trigger 'loader', true 
-				wordDAO[if @word.ID then 'update' else 'create'](@word).done =>
-					$alert = $('#submit-state').addClass('alert-success').removeClass('alert-warning').removeClass('alert-info');
-					$('strong', $alert).html "Success!" 
-					$('span', $alert).html "The changes have been sucessfuly saved to the server."
-					$alert.transition opacity: 0, delay: 3000, ->
-						$alert.addClass 'invisible'
-				.fail (xhr, error, text)=>
-					$alert = $('#submit-state').removeClass('alert-success').addClass('alert-warning').removeClass('alert-info');
-					$('strong', $alert).html "Failed." 
-					if xhr.status == 401
-						$('span', $alert).html "Sorry, the text you entered does not match the image above. Please try again."
-					else
-						$('span', $alert).html "A server error occurred whilst trying to save your changes."
-						
-					$alert.removeClass('invisible')
-				
-				.always => 	@$el.trigger 'loader', false 
+				@showAlert('info', "Sending.", "The changes are being sent to the server, please wait...").then =>				
+					return brite.dao('Word')[if @word.ID then 'update' else 'create'](@word)				
+				.then =>
+					return @showAlert('success', "Success!", "The changes have been sucessfuly saved to the server.")		
+				.always => 
+					@$el.trigger 'loader', false 
+					
+				.then =>
+					return @resetAlert(5000)
+									
+				.fail (xhr, error, text) =>
+
+					return @showAlert 'warning', "Failed.", 
+						if xhr.status == 401 
+							"Sorry, the text you entered does not match the captcha text above, please try again." 
+						else
+							"A server error occurred whilst trying to save your changes."
+
 
 				return false;
 					

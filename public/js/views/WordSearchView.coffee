@@ -17,6 +17,10 @@ define [
 		create: ()->
 			return searchTmpl.render()
 		events:
+			'change; #form-search > input': (evt)->
+				$el = $(evt.currentTarget)
+				$el.val(_($el.val()).trim())
+				
 			'submit; #form-search': (evt)->
 				# Prevent form from submitting normally.
 				evt.preventDefault()

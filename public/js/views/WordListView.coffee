@@ -48,7 +48,8 @@ define [
 				if @transition.state() == 'resolved'
 					@$el.trigger 'loader', true 
 					@transition = @hide()
-					@dao.list(data.field, data.text).always => @$el.trigger 'loader', false 
+					@dao.list(data.field, data.text).always => 
+						@$el.trigger 'loader', false
 					
 				return
 
@@ -61,6 +62,9 @@ define [
 								.css(x: $(window).width())
 								.transition x: 0, opacity: 1, transitTime, 'snap', =>
 									@transition.resolve()
+					.done => 
+						offset = Math.max(@$el.offset().top - 100, 0)
+						$('html, body').animate(scrollTop: "#{offset}px",'slow');
 								
 				console.debug(JSON.stringify(evt.daoEvent)) if log('trace')
 				return

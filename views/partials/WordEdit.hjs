@@ -57,7 +57,7 @@
 {{#captcha}}			
 			<div class="control-group">
 				<div class="controls">
-					<img src="{{{captcha}}}" /><br />
+					<img id="captcha-img" src="{{{captcha}}}" /><br />
 				</div>
 			</div>
 			<div class="control-group">

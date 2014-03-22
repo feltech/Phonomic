@@ -3,7 +3,6 @@ mysql = require('mysql');
 # Promise implementation.
 deferred = require('jquery-deferred').Deferred
 
-isRetry = false
 instance = null
 
 # Database wrapper utility class.
@@ -29,7 +28,7 @@ module.exports = class Database
 				console.log "SQL CONNECTION CLOSED."
 			@connection.on "error", (err)->
 				console.log "SQL CONNECTION ERROR: #{err}"
-		
+			return @connection
 	# Query the database with given sql and option attributes hash, using
 	# the promise idiom for returning responses.
 	query: (sql, attrs)->

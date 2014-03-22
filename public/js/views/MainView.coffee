@@ -16,6 +16,10 @@ define [
 		docEvents:
 			'loader': (evt, isShown)->
 				@loader(isShown)
+		daoEvents:
+			'result; Word': (evt)->
+				if evt.daoEvent.action == 'list' and $('#splash').length	
+					$('#splash').transition opacity: 0, 100, -> $('#splash').remove()
 			
 		loader: (isShown)->
 			if isShown then @loadingCount++ else @loadingCount--

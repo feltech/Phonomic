@@ -87,6 +87,12 @@ define(['underscore', 'jquery', 'brite', 'templates/WordSearchList', 'utils/logg
                 return _this.transition.resolve();
               });
             });
+          }).done(function() {
+            var offset;
+            offset = Math.max(_this.$el.offset().top - 100, 0);
+            return $('html, body').animate({
+              scrollTop: "" + offset + "px"
+            }, 'slow');
           });
         }
         if (log('trace')) {

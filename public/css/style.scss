@@ -51,4 +51,21 @@ div#word-edit {
 		}		
 	}
 }
+form#form-edit {
+	> fieldset {
+		> div.control-group {
+			> .control-label {
+				width: 120px;
+			}
+			> .controls {
+				margin-left: 140px;
+			}
+		}
+	}
+}
 
+div#captcha-img {
+	width: 100%;
+	margin: 0;
+	padding: 0;
+}
