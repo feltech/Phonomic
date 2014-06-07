@@ -29,9 +29,11 @@ net = require('net');
 
 FCGI = require('fastcgi-stream');
 
-fcgiSocket = net.connect(7000, 'localhost', function() {
-  return console.log(JSON.stringify(arguments));
-});
+
+//  fcgiSocket = net.connect(7000, 'localhost', function() {
+//    return console.log(JSON.stringify(arguments));
+//  });
+
 
 http = require('http');
 

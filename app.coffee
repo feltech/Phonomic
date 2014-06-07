@@ -19,9 +19,11 @@ fcgi = require('connect-fastcgi');
 net  = require 'net'
 FCGI = require 'fastcgi-stream'
 
-fcgiSocket = net.connect 7000, 'localhost', ->
-	console.log JSON.stringify(arguments)
-
+try
+	fcgiSocket = net.connect 7000, 'localhost', ->
+		console.log JSON.stringify(arguments)
+catch
+	console.warn "FCGI not running"
 
 # System
 http = require 'http'

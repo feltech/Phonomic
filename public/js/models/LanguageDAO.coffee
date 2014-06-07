@@ -5,6 +5,7 @@ define [
 	'models/WordModel'
 ], (_, $, brite, WordModel) ->
 	updateFrequency = 3 * 60 * 60 * 1000
+	P = -> $.Deferred().promise()
 
 	class LanguageDAO
 		_cache: []
@@ -13,13 +14,13 @@ define [
 		constructor: ()->
 		entityType: ()->
 			return 'Language'
-		get: (id)->
+		get: (id)-> P().then => _(@_cache).findWhere( ID: id )
 		create: ()->
 		remove: (id)->
 		removeMany: (ids)->
 		update: (data)->
 		list: (opts)->
-			if !!opts?.server or (new Date).getTime() - @_updateDate.getTime() > updateFrequency
+			if !!opts?.server || ((new Date).getTime() - @_updateDate.getTime()) > updateFrequency
 			 return $.getJSON('list/languages')
 				.then (@_cache) =>
 					return @_cache

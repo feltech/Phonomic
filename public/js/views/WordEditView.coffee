@@ -12,28 +12,54 @@ define [
 ], (_, $, brite, log, editTmpl, langTmpl, WordModel) ->
 	
 	transitTime = 200
+	P = -> $.Deferred().promise()
 
 	brite.registerView 'WordEditView',
-		create: (@word)->
+	
+		m2vm: (wordModel, wordView = {})->
+			brite.dao("Language").list().then (languages)=>
+					_(wordModel).chain().clone()
+						.extend(Languages:
+							_(wordModel.Languages.split('\t')).chain()
+								.compact()
+								.map((id)-> parseInt(id))
+								.map((id)-> _(languages).findWhere(ID: id))
+							.value())
+						.value()
+			
+			
+		vm2m: (wordView, wordModel = {})->
+			P().then ->
+				_(wordModel).extend
+					Languages: _(wordView.Languages).map((lang)-> lang.ID).join("\t")
+					Roman: wordView.Roman 
+					Native: wordView.Roman
+					Phonetic: wordView.Roman
+					captcha: $('#captcha').val()
+			
+		
+		create: (@wordModel)->
 			@alertCount = 0
 			# Create clone of word data to mutate for rendering.
-			wordRender = _.clone @word
-			# Get language data to expand word languages for rendering.
-			return brite.dao("Language").list().then (languages)=>
-				# Parse list of IDs of languages in Language table that this word references.
-				languageIDs = _.compact word.Languages?.split '\t'
-				languageIDs = _(languageIDs).map (id)-> parseInt(id)
-				# Replace list of language IDs with actual language objects.
-				wordRender.Languages = _(languageIDs).map (id)-> _(languages).findWhere(ID: id)
-				# 
-				return $.get('/captcha').then (data)-> captcha: data, languages: languages
-			.then (data)->	
-				return editTmpl.render { word: wordRender, languages: data.languages, captcha: data.captcha || undefined }, langList: langTmpl
+			@m2vm(@wordModel).then (wordView) => 
+				@wordView = wordView
+				word: wordView
+			.then (tmplParams)=>
+				brite.dao("Language").list().then (languages)-> _(tmplParams).extend(languages: languages)
+			.then (tmplParams)=>
+				$.get('/captcha').then (captcha)-> _(tmplParams).extend(captcha: captcha)
+			.then (tmplParams)=>	
+				editTmpl.render(tmplParams, langList: langTmpl)
+				
+				
 		init: ->
 			@$el.hide()
 			return
+			
+			
 		destroy: ->
 			@$el.parent().height('auto')
+			
 			
 		postDisplay: ->
 			sourceY = $(window).height() + $(window).scrollTop() + @$el.parent().height()
@@ -51,11 +77,12 @@ define [
 			return
 			
 		resolveWordLanguages: ->
-			languageDAO = brite.dao "Language"
-			return languageDAO.list().then (languages)=>
-				languageIDs = _.compact(@word.Languages?.split '\t')
-				languageIDs = _(languageIDs).map (id)-> parseInt(id)
-				return _(languageIDs).map (id)-> _(languages).findWhere(ID: id)	
+			brite.dao("Language").list().then (languages)=>
+				@word.Languages && _(@word.Languages.split('\t')).chain()
+					.compact()
+					.map((id)-> parseInt(id))
+					.map((id)-> _(languages).findWhere(ID: id))
+				.value()
 		
 		hide: ->
 			return $.Deferred (defer)=>
@@ -154,7 +181,7 @@ define [
 		winEvents:
 			'resize': ->
 				console.log "WordEditView window size changed: #{$(window).width()}x#{$(window).height()}"
-				@$el.parent().height @$el.height()
+				@$el.parent().height(@$el.height())
 #				@$el.width @$el.parent().width()
 				return false;
 		daoEvents:
